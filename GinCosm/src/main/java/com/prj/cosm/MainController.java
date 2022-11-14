@@ -8,14 +8,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.prj.cosm.sales.order.service.SalesOrderService;
-import com.prj.cosm.sales.order.service.SalesOrderVO;
+import com.prj.cosm.sales.orders.service.SalesOrdersService;
+import com.prj.cosm.sales.orders.service.SalesOrdersVO;
 
 @Controller
 public class MainController {
 	
 	@Autowired
-	SalesOrderService service;
+	SalesOrdersService service;
 	// 첫 화면
 	@RequestMapping("/main")
 	public String main(Model model) {
@@ -30,7 +30,7 @@ public class MainController {
 	// 고객 - 주문목록데이터
 	@RequestMapping("/orderList")
 	@ResponseBody
-	public List<SalesOrderVO> salesorderList(Model model) {
+	public List<SalesOrdersVO> salesorderList(Model model) {
 		return service.salesOrderList();
 	}
 

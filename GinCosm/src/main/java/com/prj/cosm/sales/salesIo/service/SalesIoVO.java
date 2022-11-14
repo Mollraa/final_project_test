@@ -1,4 +1,4 @@
-package com.prj.cosm.sales.out.info;
+package com.prj.cosm.sales.salesIo.service;
 
 import java.util.Date;
 
@@ -7,7 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import lombok.Data;
 
 @Data
-public class SalesOutInfoVO {
+public class SalesIoVO {
 //완제품 관리(출고, 검수)
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date salesOrderDate; // 주문일자

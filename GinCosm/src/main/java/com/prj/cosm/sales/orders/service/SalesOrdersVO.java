@@ -1,4 +1,4 @@
-package com.prj.cosm.sales.order.service;
+package com.prj.cosm.sales.orders.service;
 
 import java.util.Date;
 
@@ -7,7 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import lombok.Data;
 
 @Data
-public class SalesOrderVO {
+public class SalesOrdersVO {
 //고객 주문정보
 	
 	private int orderNo; //주문번호
