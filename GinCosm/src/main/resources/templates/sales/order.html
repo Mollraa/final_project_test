@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/layout}">
+
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sales Order</title>
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+</head>
+
+
+<body>
+	<div layout:fragment="content">
+		<h3>***님 주문목록입니다.</h3>
+		<button type="button" class="btn btn-outline-primary"
+			onclick="selData();">단건조회</button>
+		<button type="button" class="btn btn-outline-info">주문상세조회</button>
+		<button type="button" class="btn btn-outline-dark">주문하기</button>
+
+		<script>
+			function selData() {
+				var datas = grid.getCheckedRows();
+				var test = JSON.stringify(datas);
+				alert(test);
+			}
+		</script>
+
+		<div id="grid" style="border: 1px solid black;">주문목록main</div>
+
+
+		<script>
+			// toast - grid
+
+			/*
+			private int orderNo; //주문번호
+			private int orderClientNo; //거래처번호
+			private int orderProductNo; //제품번호
+			@DateTimeFormat(pattern = "yyyy-MM-dd")
+			private Date orderDate; //주문일자
+			@DateTimeFormat(pattern = "yyyy-MM-dd")
+			private Date orderDeliveryDate; //납기일자
+			private String orderProductName; //제품명
+			private int orderTotalNum; //수량
+			private int orderTotalPrice; //공급가액(부가세 제외한 금액)
+			private int orderSurtax;//부가세
+			private int orderNote; //비고(요청사항)
+			private String orderCode; //코드번호- 주문타입
+			private String orderProgressCode; //코드번호 - 진행상황
+			 */
+
+			window.onload = function() {
+				$.ajax({
+					url : "/orderList",
+					method : "GET",
+					dataType : "JSON",
+					success : function(result) {
+
+						console.log(result);
+
+						grid.resetData(result);
+					},
+					error : function(reject) {
+						console.log(reject);
+					}
+
+				});
+			};
+
+			var grid = new tui.Grid({
+
+				el : document.getElementById('grid'),
+				rowHeaders : [ 'checkbox' ],
+				minBodyHeight : 30,
+				pageOptions : {
+					useClient : true, // front에서만 페이징 하는 속성
+					perPage : 5
+				},
+
+				scrollX : false,
+				scrollY : false,
+
+				columns : [ {
+					header : '주문번호',
+					name : 'orderNo',
+					width : 'auto'
+				}, {
+					header : '거래처번호',
+					name : 'orderClientNo',
+				}, {
+					header : '제품번호',
+					name : 'orderProductNo'
+				}, {
+					header : '주문일자',
+					name : 'orderDate'
+				}, {
+					header : '납기일자',
+					name : 'orderDeliveryDate',
+				}, {
+					header : '제품명',
+					name : 'orderProductName',
+				}, {
+					header : '수량',
+					name : 'orderTotalNum',
+				}, {
+					header : '공급가액',
+					name : 'orderTotalPrice',
+				}, {
+					header : '부가세',
+					name : 'orderSurtax',
+
+				}, {
+					header : '요청사항',
+					name : 'orderNote',
+
+				}, {
+					header : '주문타입',
+					name : 'orderCode',
+
+				}, {
+					header : '진행사항',
+					name : 'orderProgressCode',
+
+				} ],
+				formatter : {
+					key : "dt",
+					label : "기능",
+					width : "150",
+					align : "center",
+					formatter : function() {
+						return "저장";
+					}
+				}
+			});
+		</script>
+
+		<!-- 생산요청서 모달 -->
+		<div class="modal fade" id="requestModal" tabindex="-1"
+			aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-xl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">생산요청서 목록</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div>
+							<div id="requestModalGrid" style="width: 100%;"></div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+		<script>
+			// 생산요청서 모달
+			$(document).on('shown.bs.modal', '.modal', function() {
+				var requestModalGrid = new tui.Grid({
+					el : document.getElementById('requestModalGrid'),
+					// 임시 데이터
+					data : [ {
+						boardNum : '1',
+						orderCode : 'pro_123456',
+						dates : '20221202',
+						productCode : 'MD-00200',
+						productName : '얇은피 김치만두',
+						planAmt : '300'
+					} ],
+					// data 가져오는 법
+					// data: {
+					//    api: {
+					//       readData: {
+					//          url: '/api/readData',
+					//          method: 'GET'
+					//       }
+					//    }
+					// },
+					scrollX : false,
+					scrollY : false,
+					rowHeaders : [ 'checkbox' ],
+					columnOptions : {
+						minWidth : 180
+					},
+					columns : [ {
+						header : '주문번호',
+						name : 'orderNo',
+						width : 'auto'
+					}, {
+						header : '거래처번호',
+						name : 'orderClientNo',
+					}, {
+						header : '제품번호',
+						name : 'orderProductNo'
+					}, {
+						header : '주문일자',
+						name : 'orderDate'
+					}, {
+						header : '납기일자',
+						name : 'orderDeliveryDate',
+					}, {
+						header : '제품명',
+						name : 'orderProductName',
+					}, {
+						header : '수량',
+						name : 'orderTotalNum',
+					}, {
+						header : '공급가액',
+						name : 'orderTotalPrice',
+					}, {
+						header : '부가세',
+						name : 'orderSurtax',
+
+					}, {
+						header : '요청사항',
+						name : 'orderNote',
+
+					}, {
+						header : '주문타입',
+						name : 'orderCode',
+
+					}, {
+						header : '진행사항',
+						name : 'orderProgressCode',
+
+					}  ]
+				});
+			});
+		</script>
+
+
+	</div>
+
+
+
+</body>
+
+</html>
