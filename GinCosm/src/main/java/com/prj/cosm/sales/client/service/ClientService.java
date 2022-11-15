@@ -2,23 +2,23 @@ package com.prj.cosm.sales.client.service;
 
 import java.util.List;
 
-import com.prj.cosm.sales.orders.service.SalesOrdersVO;
+import com.prj.cosm.sales.orders.service.ordersVO;
 
-public interface SalesClientService {
+public interface ClientService {
 //고객 정보 - 마이페이지
 
 	// 주문번호순으로 정렬
 	public int getOrderNo();
 
 	// 주문 전체조회
-	public List<SalesOrdersVO> salesOrderList();
+	public List<ordersVO> salesOrderList();
 
 	// 주문 단건조회
-	public SalesOrdersVO selectOrderInfo(SalesOrdersVO vo);
+	public ordersVO selectOrderInfo(ordersVO vo);
 
 	// 주문 등록
 	// public int insertOrder(int orderNo);
-	public SalesOrdersVO insertOrder(SalesOrdersVO vo);
+	public ordersVO insertOrder(ordersVO vo);
 
 	// 주문 내역삭제
 	
@@ -26,6 +26,6 @@ public interface SalesClientService {
 	
 	// 삭제-탈퇴
 	// public int deleteOrderInfo(int orderNo);
-	public SalesOrdersVO deleteOrderInfo(SalesOrdersVO vo);
+	public ordersVO deleteOrderInfo(ordersVO vo);
 
 }

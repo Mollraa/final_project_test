@@ -22,15 +22,16 @@
 <body>
 	<!-- 본문 시작 -->
 	<div layout:fragment="content">
-		<h4>생산계획 관리</h4>
+	<p>
+		<h4 style="margin-left: 50px;" align="left">주문관리</h4>
 
 		<div>
 			<!-- 탭 목록(버튼) 설정 -->
-			<ul class="nav nav-tabs nav-pills" id="myTab" role="tablist">
+			<ul  class="nav nav-tabs nav-pills" id="myTab" role="tablist">
 				<li class="nav-item" role="presentation">
 					<button class="nav-link active" id="manage-tab"
 						data-bs-toggle="tab" data-bs-target="#manage" type="button"
-						role="tab" aria-controls="manage" aria-selected="true">관리</button>
+						role="tab" aria-controls="manage" aria-selected="true">목록</button>
 				</li>
 				<li class="nav-item" role="presentation">
 					<button class="nav-link" id="insert-tab" data-bs-toggle="tab"
@@ -45,14 +46,14 @@
 					<div style="margin: 15px;">
 						<table style="width: 100%;">
 							<tr>
-								<td style="width: 90px;">진행구분 &nbsp;</td>
+								<td style="width: 90px;">상황 &nbsp;</td>
 								<td colspan="2"><input type="radio" id="whole"
 									name="process" value="whole" checked> <label
 									for="whole">전체</label> <input type="radio" id="confirm"
-									name="process" value="confirm"> <label for="confirm">자재팀확인</label>
+									name="process" value="confirm"> <label for="confirm">검수여부</label>
 									<input type="radio" id="noOrder" name="process" value="noOrder">
 									<label for="noOrder">미지시</label> <input type="radio" id="order"
-									name="process" value="order"> <label for="order">지시완료</label>
+									name="process" value="order"> <label for="order">진행상황</label>
 								</td>
 							</tr>
 							<tr>
@@ -128,13 +129,13 @@
 								<td style="text-align: left;" colspan="2">
 									<!-- 모달버튼 -->
 									<button type="button" class="btn btn-dark btn-sm"
-										data-bs-toggle="modal" data-bs-target="#requestModal">생산요청서
+										data-bs-toggle="modal" data-bs-target="#requestModal">주문
 										조회</button>
-									<button type="button" class="btn btn-dark btn-sm">계획등록</button>
+									<button type="button" class="btn btn-dark btn-sm">주문하기</button>
 									<button type="button" id="insertBtn"
-										class="btn btn-dark btn-sm">행 추가</button>
+										class="btn btn-dark btn-sm">주문삭제</button>
 									<button type="button" id="deleteBtn"
-										class="btn btn-dark btn-sm">행 삭제</button>
+										class="btn btn-dark btn-sm">주문조회</button>
 								</td>
 							</tr>
 						</table>
@@ -148,6 +149,21 @@
 
 
 		<script type="text/javascript">
+		//차트 테스트 
+		import { GaugeChart } from '@toast-ui/chart';
+		const chart = new GaugeChart({el, data, options});
+		const data = {
+				  series: [
+				    {
+				      name: 'Speed',
+				      data: [80],
+				    },
+				  ],
+				};
+		
+		
+		
+
 			$('#insertBtn').on('click', function() {
 				var newRow = {
 					eventId : '',
@@ -170,8 +186,8 @@
 			var selectBox = new tui.SelectBox('#select-box', {
 				placeholder : '제품선택',
 				data : [ {
-					label : '얇은피 고기만두',
-					value : '얇은피 고기만두 코드' // 코드 바꾸기
+					label : '자재명',
+					value : 'TPA' // 코드 바꾸기
 				}, {
 					label : '얇은피 김치만두',
 					value : '얇은피 김치만두 코드'
