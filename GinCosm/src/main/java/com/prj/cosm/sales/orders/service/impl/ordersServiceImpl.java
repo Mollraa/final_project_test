@@ -30,19 +30,19 @@ public class ordersServiceImpl implements ordersService{
 	@Override
 	public ordersVO selectOrderInfo(ordersVO vo) {
 		// TODO Auto-generated method stub
-		return null;
+		return mapper.orderInfo(vo);
 	}
 
 	@Override
 	public ordersVO insertOrder(ordersVO vo) {
 		// TODO Auto-generated method stub
-		return null;
+		return mapper.insertOrder(vo);
 	}
 
 	@Override
 	public ordersVO deleteOrderInfo(ordersVO vo) {
 		// TODO Auto-generated method stub
-		return null;
+		return mapper.deleteOrder(vo);
 	}
 
 }
