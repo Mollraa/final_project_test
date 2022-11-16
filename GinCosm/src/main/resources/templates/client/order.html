@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/layout/layout}">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	layout:decorate="~{/layout/layout}">
 
 <head>
 	<meta charset="UTF-8">
@@ -11,11 +13,12 @@
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+
+
 </head>
 
 
 <body>
-
 	<div layout:fragment="content">
 
 		<h3 align="center">***님 주문목록입니다.</h3>
@@ -123,7 +126,6 @@
 			});
 
 			/*
-			 * 
 			var today = new Date();
 			var picker = tui.DatePicker.createRangePicker({
 			    startpicker: {
@@ -144,6 +146,7 @@
 
 			const grid = new tui.Grid({
 				el: document.getElementById('grid'),
+				/*
 				data: [{
 					orderNo: 1,
 					clientNo: 100,
@@ -158,6 +161,7 @@
 					orderCode: '신규',
 					orderProgressCode: '5259'
 				}],
+				*/
 				rowHeaders: ['checkbox'],
 				scrollX: false,
 				scrollY: false,

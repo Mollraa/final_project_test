@@ -5,24 +5,33 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.prj.cosm.sales.orders.service.ordersService;
-import com.prj.cosm.sales.orders.service.ordersVO;
+import com.prj.cosm.sales.orders.service.OrdersService;
+import com.prj.cosm.sales.orders.service.OrdersVO;
 
 @Controller
-@CrossOrigin("*")
+//@CrossOrigin("*")
 public class MainController {
 	
 	@Autowired
-	ordersService service;
+	OrdersService service;
+	
+	
+	//영업 - 주문조회 리스트
+	@ResponseBody
+	@GetMapping("/ajax/orders")
+	public List<OrdersVO> ajaxOrder(Model model) {
+		return service.salesOrderList();
+	}
+	
 	//고객 --------------------------------
 	// 첫 화면
 	@RequestMapping("/main")
-	public String main(Model model) {
-		return "index";
+	public List<OrdersVO> main(Model model) {
+		return service.salesOrderList();
 	}
 
 	// 고객 주문목록 관리 메인
@@ -33,7 +42,7 @@ public class MainController {
 	// 고객 - 주문목록데이터
 	@RequestMapping("/orderList")
 	@ResponseBody
-	public List<ordersVO> clientorderList(Model model) {
+	public List<OrdersVO> clientorderList(Model model) {
 		model.addAttribute("id", service.getOrderNo());
 		return service.salesOrderList();
 	}
@@ -44,25 +53,33 @@ public class MainController {
 		return "client/insert";
 	}
 	
-	@RequestMapping("/test")
-	public String test(Model model) {
-		return "client/modaltest";
+	//마이페이지
+	@RequestMapping("/my")
+	public String clientMypage(Model model) {
+		return "client/myPage";
 	}
 	
-	
+
 	
 	//영업팀 -----------------------------------
+
+	//메인페이지 - 주문관리
+	@RequestMapping("/test")
+	public String test(Model model) {
+		return "sales/dtest";
+	}
 	
-	
-	@RequestMapping("/orders")
+	@GetMapping("/orders")
 	public String salesorder(Model model) {
-		return "sales/order";
+		return "sales/orders";
 	}
 	// 사원 - 주문목록데이터
-	@RequestMapping("/orderList")
+	@GetMapping("/ordersList")
 	@ResponseBody
-	public List<ordersVO> salesorderList(Model model) {
+	public List<OrdersVO> salesorderList(Model model) {
 		model.addAttribute("id", service.getOrderNo());
 		return service.salesOrderList();
 	}
+	
+	/*main - 주문목록조회 = ajax, get*/
 }

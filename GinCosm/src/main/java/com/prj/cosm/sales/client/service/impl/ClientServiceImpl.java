@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.prj.cosm.sales.client.mapper.ClientMapper;
 import com.prj.cosm.sales.client.service.ClientService;
-import com.prj.cosm.sales.orders.service.ordersVO;
+import com.prj.cosm.sales.orders.service.OrdersVO;
 
 @Service
 public class ClientServiceImpl implements ClientService  {
@@ -22,25 +22,25 @@ public class ClientServiceImpl implements ClientService  {
 	}
 
 	@Override
-	public List<ordersVO> salesOrderList() {
+	public List<OrdersVO> salesOrderList() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ordersVO selectOrderInfo(ordersVO vo) {
+	public OrdersVO selectOrderInfo(OrdersVO vo) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ordersVO insertOrder(ordersVO vo) {
+	public OrdersVO insertOrder(OrdersVO vo) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ordersVO deleteOrderInfo(ordersVO vo) {
+	public OrdersVO deleteOrderInfo(OrdersVO vo) {
 		// TODO Auto-generated method stub
 		return null;
 	}

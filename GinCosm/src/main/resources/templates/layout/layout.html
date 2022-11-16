@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 
 <head>
 <meta charset="UTF-8">
@@ -60,25 +60,36 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 				<div class="sb-sidenav-menu">
 					<div class="nav">
 						<div class="sb-sidenav-menu-heading">welcome to cosm</div>
-						
-						<a class="nav-link" href="index.html" sec:authorize="isAuthenticated()" >
+
+						<a class="nav-link" href="index.html"
+							sec:authorize="isAuthenticated()">
 							<div class="sb-nav-link-icon">
 								<i class="fas fa-tachometer-alt"></i>
 							</div> 주문조회
+						</a> <a class="nav-link" href="index.html">
+							<div class="sb-nav-link-icon">
+								<i class="fas fa-tachometer-alt"></i>
+							</div> 주문조회
+						</a> <a class="nav-link" href="index.html">
+							<div class="sb-nav-link-icon">
+								<i class="fas fa-tachometer-alt"></i>
+							</div> 제품리스트 - 비회원열람가능
 						</a>
-						
+						<hr>
 						<a class="nav-link" href="index.html">
 							<div class="sb-nav-link-icon">
 								<i class="fas fa-tachometer-alt"></i>
-							</div> 주문조회
-						</a>
-						
-						<a class="nav-link" href="index.html">
+							</div> 주문관리 - 생산팀
+						</a> <a class="nav-link" href="index.html">
 							<div class="sb-nav-link-icon">
 								<i class="fas fa-tachometer-alt"></i>
-							</div> 주문조회
+							</div> 생산요청관리
+						</a> <a class="nav-link" href="index.html">
+							<div class="sb-nav-link-icon">
+								<i class="fas fa-tachometer-alt"></i>
+							</div> 완제품관리
 						</a>
-						
+
 						<div class="sb-sidenav-menu-heading">***님</div>
 						<a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
 							data-bs-target="#collapseLayouts" aria-expanded="false"
@@ -93,11 +104,8 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 						<div class="collapse" id="collapseLayouts"
 							aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
 							<nav class="sb-sidenav-menu-nested nav">
-								<a class="nav-link" href="layout-static.html">
-								내정보조회</a> 
-								<a class="nav-link" href="layout-sidenav-light.html">
-								회원탈퇴
-								</a>
+								<a class="nav-link" href="layout-static.html"> 내정보조회</a> <a
+									class="nav-link" href="layout-sidenav-light.html"> 회원탈퇴 </a>
 							</nav>
 						</div>
 						<a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
@@ -152,7 +160,7 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 						<a class="nav-link" href="charts.html">
 							<div class="sb-nav-link-icon">
 								<i class="fas fa-chart-area"></i>
-							</div> 차트 or SVG로 보여줄 곳 
+							</div> 차트 or SVG로 보여줄 곳
 						</a> <a class="nav-link" href="tables.html">
 							<div class="sb-nav-link-icon">
 								<i class="fas fa-table"></i>

@@ -5,15 +5,15 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.prj.cosm.sales.orders.mapper.ordersMapper;
-import com.prj.cosm.sales.orders.service.ordersService;
-import com.prj.cosm.sales.orders.service.ordersVO;
+import com.prj.cosm.sales.orders.mapper.OrdersMapper;
+import com.prj.cosm.sales.orders.service.OrdersService;
+import com.prj.cosm.sales.orders.service.OrdersVO;
 
 @Service
-public class ordersServiceImpl implements ordersService{
+public class OrdersServiceImpl implements OrdersService{
 
 	@Autowired
-	ordersMapper mapper;
+	OrdersMapper mapper;
 	
 	@Override
 	public int getOrderNo() {
@@ -22,27 +22,34 @@ public class ordersServiceImpl implements ordersService{
 	}
 
 	@Override
-	public List<ordersVO> salesOrderList() {
+	public List<OrdersVO> salesOrderList() {
 		// TODO Auto-generated method stub
 		return mapper.orderList();
 	}
 
 	@Override
-	public ordersVO selectOrderInfo(ordersVO vo) {
+	public OrdersVO selectOrderInfo(OrdersVO vo) {
 		// TODO Auto-generated method stub
 		return mapper.orderInfo(vo);
 	}
 
 	@Override
-	public ordersVO insertOrder(ordersVO vo) {
+	public int insertOrder(OrdersVO vo) {
 		// TODO Auto-generated method stub
 		return mapper.insertOrder(vo);
 	}
 
+
 	@Override
-	public ordersVO deleteOrderInfo(ordersVO vo) {
+	public int deleteOrder(OrdersVO vo) {
 		// TODO Auto-generated method stub
 		return mapper.deleteOrder(vo);
+	}
+
+	@Override
+	public int deleteOrderInfo(OrdersVO vo) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }
