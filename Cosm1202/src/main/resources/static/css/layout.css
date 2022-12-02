@@ -1,0 +1,48 @@
+#alertTable>thead>tr, #alertTable>thead>tr>th, #alertTable>thead>tr>td,
+	#alertTable>thead {
+	border: 1px solid black;
+	border-radius: 5px;
+	user-select: none;
+}
+
+#alertBody>tr, #alertBody>tr>td {
+	border: 1px solid black;
+	border-radius: 5px;
+	overflow:hidden;
+	text-overflow: ellipsis;
+}
+
+#alertBody>tr>td:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+#alertTable {
+	border: 1px solid black;
+	border-radius: 5px;
+	padding: 10px;
+	
+}
+
+#alertYn {
+	animation-iteration-count: infinite;
+	animation-delay: 250ms;
+	animation-duration: 1s;
+}
+
+@keyframes btnColor { 
+	0% {color: white;}
+	50%{color:red;}
+	100%{color:white;}
+}
+
+  	@import url('https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700,800');
+body {
+	-webkit-user-select:none;
+  	-moz-user-select:none;
+  	-ms-user-select:none;
+  	user-select:none;
+  	font-family: 'Nanum Gothic', sans-serif;
+  	
+  	
+}

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.prj.cosm.sales.orders.mapper.OrdersMapper">
+	<!-- 주문번호순으로 정렬 - public int getOrderNo(); -->
+	<select id="getOrderNo" resultType="Integer">
+		select max(substr(order_no,
+		-4,4)+1) from orders
+	</select>
+
+
+	<!-- 신규주문 전체조회 -->
+	<!-- select o.order_no, o.order_date, o.delivery_date, o.total_num, o.pro_price, 
+		o.surtax, o.note, find_code_no(o.order_code) as order_code , o.delivery_info, 
+		o.io_code, g.goods_no, g.goods_name, c.users_no from orders o JOIN produce_goods 
+		g on o.goods_no = g.goods_no JOIN client c on o.users_no = c.users_no -->
+	<!-- select o.order_no, p.goods_no, o.order_date, o.delivery_date, o.total_num, 
+		o.pro_price, o.note, find_code_no(order_code) as order_code, find_code_no(ORDER_PROGRESS_CODE) 
+		as ORDER_PROGRESS_CODE, find_code_no(DELIVERY_INFO) as DELIVERY_INFO, find_code_no(IO_CODE) 
+		as IO_CODE, o.total_price , c.users_no, o.surtax from orders o, client c, 
+		produce_goods p where o.users_no= c.users_no and o.goods_no = p.goods_no -->
+	<select id="getOrderList" resultType="OrdersVO">
+		select
+		o.order_no,p.goods_no, p.goods_name, o.order_date, o.delivery_date,
+		o.total_num, o.pro_price, o.note, find_code_no(order_code) as
+		order_code,
+		find_code_no(ORDER_PROGRESS_CODE) as ORDER_PROGRESS_CODE,
+		find_code_no(DELIVERY_INFO) as DELIVERY_INFO,
+		find_code_no(IO_CODE) as IO_CODE,
+		o.total_price , o.surtax, c.client_name
+		from orders o, produce_goods p , client c
+		where o.goods_no = p.goods_no
+		and o.client_name = c.users_no
+		and order_code = 'B0106'
+	</select>
+
+	<!-- 접수주문 조회 --> 
+	<select id="getReceiptList" resultType="OrdersVO">
+		select o.order_no,p.goods_no, p.goods_name,
+		o.order_date, o.delivery_date,
+		o.total_num, o.pro_price, o.note, find_code_no(order_code) as order_code,
+		find_code_no(ORDER_PROGRESS_CODE) as ORDER_PROGRESS_CODE,
+		find_code_no(DELIVERY_INFO) as DELIVERY_INFO,
+		find_code_no(IO_CODE) as IO_CODE,
+		o.total_price , o.surtax, c.client_name
+		from orders o, produce_goods p , client c
+		where o.goods_no = p.goods_no
+		and o.client_name = c.users_no
+		and order_code = 'B0107'
+		order by order_no desc
+	</select>
+
+
+	<!-- 접수주문 단건조회 -->
+	<select id="getOrderInfo" resultType="ordersVO">
+		SELECT * FROM orders
+		WHERE ORDER_NO = #{orderNo}
+	</select>
+
+
+
+	<!-- 주문 등록 -->
+	<!-- ORDER_CODE - 신규,불량,재주문 추가하기 -->
+	 <insert id="insertOrder" parameterType="OrdersVO">
+
+		<selectKey order="BEFORE" keyProperty="orderNo"
+			resultType="String">
+			<if test="orderNo == null"> SELECT 'COO_' ||
+				LPAD(NVL(MAX(SUBSTR(order_no,-4)),0)+1,4,0)
+				FROM orders
+			</if>
+		</selectKey>
+		INSERT INTO orders (
+		ORDER_NO,
+		GOODS_NO,
+		CLIENT_NAME,
+		DELIVERY_DATE,
+		TOTAL_NUM,
+		NOTE,
+		TOTAL_PRICE
+		)
+		values (
+		#{orderNo},
+		(select GOODS_NO from produce_goods where GOODS_NAME=#{goodsName}),
+		#{usersNo},
+		#{deliveryDate},
+		#{totalNum},
+		#{note},
+		#{totalPrice}
+		)
+	</insert>
+
+
+	<!-- 주문 내역삭제 -->
+	<delete id="deleteOrder" parameterType="Integer">
+		DELETE FROM orders where
+		ORDER_NO = #{orderNo}
+	</delete>
+
+	<!-- 체크박스 단건삭제 -->
+	<delete id="deleteCheck" parameterType="String">
+		DELETE FROM orders where
+		ORDER_NO = #{noList}
+	</delete>
+
+	<!-- 신규 주문 등록 -->
+	<!-- recNos값 하나만 들고와줘서 주기만 하면됨 -->
+	<update id="recNos">
+		UPDATE orders SET ORDER_CODE = 'B0107' WHERE order_no IN
+		<foreach collection="vo" item="recNos" open="(" close=")"
+			separator=",">
+			#{recNos.orderNo}
+		</foreach>
+	</update>
+
+
+	<!-- 주문수정(주문 신규/재주문 상태) (출고 상황) (배송상황) -->
+	<!-- <if test="title != null and !title.equals('')"> title = #{title}, </if> -->
+	<update id="updateOrder" parameterType="OrdersVO">
+		UPDATE orders
+		<set>
+			<if
+				test="orderProgressCode != null and !orderProgressCode.equals('')">
+				order_progress_code = #{orderProgressCode}
+			</if>
+			<if test="deliveryInfo != null and !deliveryInfo.equals('')">
+				,delivery_info = #{deliveryInfo}
+			</if>
+			<if test="ioCode != null and !ioCode.equals('')">
+				, io_code = #{ioCode}
+			</if>
+		</set>
+		WHERE order_no = #{orderNo}
+	</update>
+
+</mapper>

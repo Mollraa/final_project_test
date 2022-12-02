@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.prj.cosm.sales.salesIo.mapper.SalesIoMapper">
+
+	<!-- 완제품 번호 -->
+	<select id="getSalesNo" resultType="Integer">
+		select
+		max(substr(SALES_NO,-4,4)+1) from sales_io
+	</select>
+
+	<!-- 완제품 전체조회 -->
+	<select id="getSalesIoList" resultType="SalesIoVO">
+		select c.client_name, g.goods_name, r.regist_LOT, o.ORDER_NO, o.ORDER_DATE,
+		o.DELIVERY_DATE, o.users_no,
+		find_code_no(o.order_code) as order_code
+		from produce_regist r join produce_instruct i
+		on r.regist_instruct_no =
+		i.instruct_no
+		JOIN produce_plan p
+		ON i.instruct_plan_no = p.plan_no
+		JOIN
+		orders o
+		ON p.plan_order_no = o.order_no
+		JOIN produce_goods g
+		ON o.goods_no = g.goods_no
+		JOIN client c
+		ON o.client_name = c.users_no
+	</select>
+
+	<!-- 단건조회 -->
+	<select id="selectSalesInfo" parameterType="String">
+		select
+		SALES_NO,
+		ORDER_DATE,
+		DELIVERY_DATE,
+		STATE,
+		NOTE,
+		CODE_NO,
+		CKECK,
+		ORDER_NO,
+		USERS_NO,
+		REGIST_LOT
+		from sales_io
+		where sales_no = #{salesNo}
+	</select>
+
+	<!-- 등록 -->
+	<insert id="insertSalesInfo" parameterType="SalesIoVO">
+		insert into sales_io
+		(
+		SALES_NO,
+		ORDER_DATE,
+		DELIVERY_DATE,
+		STATE,
+		NOTE,
+		CODE_NO,
+		CKECK,
+		ORDER_NO,
+		USERS_NO,
+		REGIST_LOT
+		) values (
+		#{salesNo},
+		#{orderDate},
+		#{deliveryDate},
+		#{state},
+		#{note},
+		#{codeNo},
+		#{ckeck},
+		#{orderNo},
+		#{usersNo},
+		#{registLot}
+		)
+	</insert>
+
+	<!-- 수정 : 진행상황, 검수여부 -->
+	<update id="updateSales" parameterType="SalesIoVO">
+		UPDATE SALES_IO
+		<set>
+			<if test="state != null and !state.equals('')">
+				STATE = #{state}
+			</if>
+			<if test="ckeck != null and !ckeck.equals('')">
+				,CKECK = #{ckeck}
+			</if>
+		</set>
+		WHERE SALES_NO = #{salesNo}
+	</update>
+
+	<!-- 삭제 -->
+	<delete id="deleteSales" parameterType="Integer">
+		DELETE FROM sales_io
+		WHERE sales_no = #{salesNo}
+	</delete>
+
+	<!-- 여러조건 삭제 -->
+	<delete id="deleteCheck" parameterType="String">
+		DELETE FROM sales_io
+		where
+		sales_no = #{salesNo}
+	</delete>
+
+	<!-- 출고시 출고대기 -> 완료 -->
+	<update id="updateOutInfo" parameterType="SalesIoVO">
+		UPDATE ORDERS SET ORDER_CODE = 'A0103' WHERE order_no IN
+		<foreach collection="list" item="vo" open="(" close=")"
+			separator=" , ">
+			#{vo.orderNo}
+		</foreach>
+	</update>
+</mapper>

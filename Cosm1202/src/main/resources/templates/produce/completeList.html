@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/layout}">
+<head>
+<meta charset="UTF-8">
+
+<title>Insert title here</title>
+
+</head>
+<body>
+	<div layout:fragment="content"  style="margin-left: 80px; margin-right: 80px;">
+		
+		<hr style="width: 100%">
+		<h3 style="text-align: center">완제품 리스트</h3>
+		<br>
+		
+		<div id="select_input">
+						<span>등록일자</span>
+						<div class="tui-datepicker-input tui-datetime-input tui-has-focus"
+							style="margin-left: -1px; z-index: 1100">
+							<input id="startpicker-input" type="text" aria-label="Date"
+								style="z-index: 1100"> <span class="tui-ico-date"></span>
+							<div id="startpicker-container"
+								style="margin-left: -1px; z-index: 1100"></div>
+						</div>
+						<span>~</span>
+						<div class="tui-datepicker-input tui-datetime-input tui-has-focus"
+							style="z-index: 1100">
+							<input id="endpicker-input" type="text" aria-label="Date"
+								style="margin-left: -1px; z-index: 1100"> <span
+								class="tui-ico-date"></span>
+							<div id="endpicker-container"
+								style="margin-left: -1px; z-index: 1100"></div>
+						</div>
+						<button type="button" class="btn btn-secondary" id="searchBtn">조회</button>
+						
+
+					</div>
+		
+		<button type="button" class="btn btn-dark btn-sm" style="float: right"
+			id="delbtn">완제품 삭제</button>
+		
+			
+		<input onkeyup="filter2()" type="text" style="float: right" id="searchFilter2">	
+		<label style="float: right; margin-right: 20px">검수여부 검색</label>
+		<div id="grid" ></div>
+
+
+		<script>
+	
+	
+	function filter2(){ // 토스트그리드 필터이용 검색함수
+
+		const search = document.getElementById("searchFilter2") //인풋태그
+		      
+		const state = [{code: 'contain', value: search.value}];
+		
+		      if(search.value == ''){   
+		         
+		    	  grid.unfilter('INSPECTION');
+		      
+		      }else {
+		          
+		    	  grid.filter(('INSPECTION'), state);
+		      }
+		      
+		}
+	
+	window.onload = function () {
+		//완제품리스트 가져오기
+		registList();
+		searchBtnHandler();
+		
+		grid.on('check', (ev) => {
+			for(let i=0;i<$('#grid input:checkbox[name="_checked"]').length;i++){
+				if(i!=`${ev.rowKey}`){
+					grid.uncheck(i);	
+				}
+			}
+			$('#delbtn').prop('disabled', false);
+		});
+		grid.on('uncheck', (ev) => {
+			$('input:text').val('');
+			$('#delbtn').prop('disabled', true);
+		});
+		$('#delbtn').prop('disabled', true);
+		$('#grid span').remove();
+		
+	}
+	var grid = new tui.Grid({
+		el: document.getElementById('grid'),
+		minBodyHeight: 30,
+		rowHeaders: ['checkbox'],
+		pageOptions: {
+			useClient: true, // front에서만 페이징 하는 속성
+			perPage: 10
+		},
+		scrollX: false,
+		scrollY: false,
+		columns: [
+			{
+				header: 'LOT넘버',
+				name: 'REGIST_LOT',
+				filter: {
+				       type: 'select',
+				        showApplyBtn: true,
+				        showClearBtn: true
+				      },
+				align : 'center'
+			},
+			{
+				header: '주문번호',
+				name: 'PLAN_ORDER_NO',
+				align : 'center'
+			},
+			{
+				header: '제품번호',
+				name: 'REGIST_PRODUCT_NO',
+				align : 'center'
+			},	
+			{
+				header: '바코드 라벨',
+				name: 'REGIST_LABEL',
+				align : 'center'
+			},
+			{
+				header: '등록수량',
+				name: 'REGIST_QUANTITY',
+				align : 'center'
+			},
+			{
+				header: '불량수량',
+				name: 'REGIST_ERROR',
+				align : 'center'
+			},	
+			{
+				header: '등록일자(desc)',
+				name: 'REGIST_DATE',
+				sortingType: 'desc',
+				sortable: true,
+				align : 'center',
+				filter : 'date'
+			},
+			{
+				header: '지시번호',
+				name: 'REGIST_INSTRUCT_NO',
+				align : 'center'
+			},	
+			
+			{
+				header: '단위코드',
+				name: 'CODE_NO',
+				align : 'center'
+			},	
+			{
+				header: '검수여부',
+				name: 'INSPECTION',
+				align : 'center',
+				filter : 'text',
+				renderer : {
+				 	styles: {
+						fontWeight: 'bold',
+						color: (props) => props.value == '검수완료' ? 'blue' :  props.value == '불량발생' ? 'red' : 'black'
+					}
+				},
+			},	
+			],
+		
+		});
+	
+	//완제품리스트 가져오기
+	function registList(){
+		$.ajax({
+			url: "/produce/completedList",
+			method: "GET",
+			dataType: "JSON",
+			success: function (result) {
+				console.log(result);
+				for (let regist of result) {
+					regist.REGIST_DATE = String(regist.REGIST_DATE).substr(0, 10);
+				}
+				grid.resetData(result);
+			
+			
+			
+			},
+			error: function (reject) {
+				console.log(reject);
+			}
+		});
+	}
+	
+	let today = new Date();
+	let picker = new tui.DatePicker.createRangePicker({
+		startpicker : {
+			date : today,
+			input : '#startpicker-input',
+			container : '#startpicker-container'
+		},
+		endpicker : {
+			date : today,
+			input : '#endpicker-input',
+			container : '#endpicker-container'
+		},
+		selectableRanges : [[
+				new Date(today.getFullYear() - 5, today.getMonth(),
+						today.getDate()),
+				new Date(today.getFullYear() + 5, today.getMonth(),
+						today.getDate()) ] ]
+
+	});
+	
+	/*-----------------------
+ 	날짜 검색 버튼 이벤트 핸들러
+ --------------------------*/
+function searchBtnHandler() {
+	$('#searchBtn').on('click', function() {
+		let getStartDay = $('#startpicker-input').val();
+		let getEndDay = $('#endpicker-input').val();
+		console.log(getStartDay);
+		console.log(getEndDay);
+
+		$.ajax({
+			url : '/produce/completedList',
+			data : {
+				"startDate" : getStartDay,
+				"endDate" : getEndDay
+			},
+			contentType : "application/json",
+			method : 'GET',
+			dataType : 'json',
+			success : function(result) {
+				for (let regist of result) {
+					regist.REGIST_DATE = String(regist.REGIST_DATE).substr(0, 10);
+				}
+				console.log(result);
+				grid.resetData(result);
+			},
+			error : function(reject) {
+				console.log(reject);
+			}
+		})
+
+	})
+
+}
+//완제품정보 삭제
+$().ready(function () {
+    $("#delbtn").click(function () {
+        Swal.fire({
+            title: '선택한 완제품정보를 삭제하시겠습니까?',
+            text: "다시 되돌릴 수 없습니다. 신중하세요.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: 'black',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '승인',
+            cancelButtonText: '취소'
+        }).then((result) => {
+        	var datas2 = grid.getCheckedRows();
+        	var data1 = datas2[0].REGIST_LOT;
+            if (result.isConfirmed) {
+            	$.ajax({
+        			url : '/produce/registDelete',
+        			type : 'get',
+        			data : {registLOT : data1},
+        			success : function(data){
+        				Swal.fire(
+    		                    '삭제가 완료되었습니다.',
+    		                    '화끈하시네요~!',
+    		                    'success'
+    		                )
+        				registList();
+        			},
+        			error : function(reject){
+        				console.log(reject);
+        			}
+        		});
+            }
+        })
+    });
+});
+
+tui.Grid.applyTheme("normal", {
+    cell : {
+       nomal : {
+          background : "#fff",
+          border : "#e0e0e0",
+          showVerticalBorder : false,
+          showHorizontalBorder : true
+       },
+       header : {
+          background : "#eaeaea",
+          border : "#e0e0e0",
+          showHorizontalBorder : true
+       },
+       rowHeader : {
+          background : "#eaeaea",
+          border : "#e0e0e0",
+          showVerticalBorder : false,
+          showHorizontalBorder : true
+       },
+    },
+
+ });
+	</script>
+	</div>
+</body>
+</html>

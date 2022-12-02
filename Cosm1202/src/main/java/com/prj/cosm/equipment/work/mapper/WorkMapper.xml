@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.prj.cosm.equipment.work.mapper.WorkMapper">
+<!-- ############################################################################################  -->																						 																						
+ 																					<!-- 공사 -->	
+	
+	<!-- 공사 전체 리스트 -->
+	<select id="getWorkAllList" resultType="workVO">
+		SELECT w.work_no, w.work_equip_no, e.equip_name AS work_equip_name, 
+			   w.work_name, w.work_content, w.work_company, w.work_pay,
+			    w.work_date, w.work_end_date, w.work_ps
+			  ,(select code_name from code where code_no = w.work_code) AS work_code
+			  ,s.sign_emp_no, s.sign_seq, s.sign_date
+			  ,(select code_name from code where code_no = s.sign_code) AS sign_code 
+		FROM equip e, work w, work_sign s
+		where e.equip_no = w.work_equip_no
+		and w.work_no = s.sign_work_no
+		ORDER BY work_no DESC
+	</select>
+	
+	<!-- 완료 안된 공사 리스트 조회 -->
+	<select id="getIncompleteWorkList" resultType="workVO">
+	SELECT w.work_no, w.work_equip_no, e.equip_name AS work_equip_name, 
+			   w.work_name, w.work_content, w.work_company, w.work_pay,
+			    w.work_date, w.work_end_date, w.work_ps
+			  ,(select code_name from code where code_no = w.work_code) AS work_code
+			  ,s.sign_emp_no, s.sign_seq, s.sign_date
+			  ,(select code_name from code where code_no = s.sign_code) AS sign_code 
+		FROM equip e, work w, work_sign s
+		where e.equip_no = w.work_equip_no
+		and w.work_no = s.sign_work_no
+        and sign_seq != 4
+		ORDER BY work_no DESC
+	</select>
+	
+	<!-- SEQ 1 공사 리스트 조회 -->
+	<select id="getIncompleteWork1" resultType="workVO">
+	SELECT w.work_no, w.work_equip_no, e.equip_name AS work_equip_name, 
+			   w.work_name, w.work_content, w.work_company, w.work_pay,
+			    w.work_date, w.work_end_date, w.work_ps
+			  ,(select code_name from code where code_no = w.work_code) AS work_code
+			  ,s.sign_emp_no, s.sign_seq, s.sign_date
+			  ,(select code_name from code where code_no = s.sign_code) AS sign_code 
+		FROM equip e, work w, work_sign s
+		where e.equip_no = w.work_equip_no
+		and w.work_no = s.sign_work_no
+        and sign_seq = 1
+		ORDER BY work_no DESC
+	</select>
+	
+	<!-- SEQ 2 공사 리스트 조회 -->
+	<select id="getIncompleteWork2" resultType="workVO">
+	SELECT w.work_no, w.work_equip_no, e.equip_name AS work_equip_name, 
+			   w.work_name, w.work_content, w.work_company, w.work_pay,
+			    w.work_date, w.work_end_date, w.work_ps
+			  ,(select code_name from code where code_no = w.work_code) AS work_code
+			  ,s.sign_emp_no, s.sign_seq, s.sign_date
+			  ,(select code_name from code where code_no = s.sign_code) AS sign_code 
+		FROM equip e, work w, work_sign s
+		where e.equip_no = w.work_equip_no
+		and w.work_no = s.sign_work_no
+        and sign_seq = 2
+		ORDER BY work_no DESC
+	</select>
+	
+	<!-- SEQ 3 공사 리스트 조회 -->
+	<select id="getIncompleteWork3" resultType="workVO">
+	SELECT w.work_no, w.work_equip_no, e.equip_name AS work_equip_name, 
+			   w.work_name, w.work_content, w.work_company, w.work_pay,
+			    w.work_date, w.work_end_date, w.work_ps
+			  ,(select code_name from code where code_no = w.work_code) AS work_code
+			  ,s.sign_emp_no, s.sign_seq, s.sign_date
+			  ,(select code_name from code where code_no = s.sign_code) AS sign_code 
+		FROM equip e, work w, work_sign s
+		where e.equip_no = w.work_equip_no
+		and w.work_no = s.sign_work_no
+        and sign_seq = 3
+		ORDER BY work_no DESC
+	</select>
+	
+	<!-- 완료된 공사 리스트 조회 -->
+	<select id="getCompleteWorkList" resultType="workVO">
+		SELECT w.work_no, w.work_equip_no, e.equip_name AS work_equip_name, 
+			   w.work_name, w.work_content, w.work_company, w.work_pay,
+			    w.work_date, w.work_end_date, w.work_ps
+			  ,(select code_name from code where code_no = w.work_code) AS work_code
+			  ,s.sign_emp_no, s.sign_seq, s.sign_date
+			  ,(select code_name from code where code_no = s.sign_code) AS sign_code 
+		FROM equip e, work w, work_sign s
+		where e.equip_no = w.work_equip_no
+		and w.work_no = s.sign_work_no
+        and sign_seq = 4
+		ORDER BY work_no DESC
+	</select>
+
+	<!-- 공사 등록 -->
+	<insert id="insertWork" parameterType="workVO">
+		  INSERT INTO WORK ( work_no
+							,work_equip_no
+							,work_name
+							,work_content
+							,work_company
+	                        ,work_pay
+							,work_date
+							,work_end_date
+							,work_ps
+							,work_code
+							)
+			         values ( #{workNo}
+					        ,(SELECT equip_no
+						      FROM equip
+						      WHERE equip_name = #{workEquipName})
+						    ,#{workName}
+					        ,#{workContent}
+					        ,#{workCompany}
+					        ,#{workPay}
+					        ,#{workDate}
+					        ,#{workEndDate}
+					        ,#{workPs}
+					        ,'C0101')
+	</insert>
+	<!-- 공사 결재 정보 등록 -->
+	<insert id="insertWorkSign" parameterType="workVO">
+  
+	    INSERT INTO WORK_SIGN ( 
+								 SIGN_WORK_NO
+		                        ,SIGN_EMP_NO
+								,SIGN_SEQ 
+								,SIGN_DATE
+								,SIGN_CODE
+								)
+						 values (#{workNo}
+							   ,(select users_no from users where users_id = #{usersId})
+							   ,1 <!-- 결재 되는 순서대로 (사원)1,2,3,4 -->
+							   ,SYSDATE
+							   ,'C0101'
+							   )
+	</insert>
+
+	<!-- 입력될 공사 번호 조회 -->
+	<select id="getWorkNo" resultType="workVO">
+		SELECT NVL(MAX(work_no),0) + 1 AS work_no
+		FROM WORK
+	</select>
+
+	<!-- 공사 단건 조회-->
+	<select id="getWorkInfo" parameterType="Integer" resultType="workVO">
+		SELECT w.work_no,w.work_name,(select equip_name from equip where equip_no=#{workEquipNo}) AS work_equip_name
+			   ,w.work_content, w.work_pay,work_ps, w.work_company, w.work_date, w.work_end_date
+			   ,(select code_name from code where code_no=u.users_author) as position
+               ,s.sign_emp_no,s.sign_seq,u.users_name, u.users_author,s.sign_code
+		FROM work w, work_sign s, users u
+		where w.work_no = s.sign_work_no
+		and s.sign_emp_no = u.users_no
+		and work_no=#{workNo}
+	</select>
+	
+	<!-- 공사 수정 미완료 -->
+	<update id="updateWork" parameterType="workVO">
+	UPDATE work
+	<set>
+		<if test="workName !=null and !workName.equals('')">
+		work_name = #{workName},
+		</if>									
+		<if test="workEquipName !=null and !workEquipName.equals('')">
+		work_equip_no = (select equip_no from equip where equip_name = #{workEquipName}),
+		</if>									
+		<if test="workContent !=null and !workContent.equals('')">
+		work_content = #{workContent},
+		</if>									
+		<if test="workCompany !=null and !workCompany.equals('')">
+		work_company = #{workCompany},
+		</if>									
+		<if test="workPs !=null and !workPs.equals('')">
+		work_ps = #{workPs},
+		</if>									
+		<if test="workPay !=null">
+		work_pay = #{workPay},
+		</if>									
+	</set>
+	WHERE work_no = #{workNo}
+	
+	</update>
+	
+	<!-- 공사 결재 승인 seq + 1 -->
+	<update id="updateSignSeq" parameterType="workVO">
+	 update work_sign
+		 <set>
+			  <if test="signSeq == 3">
+			     sign_code = 'C0102',
+			  </if>
+		  	  sign_seq = sign_seq + 1
+		 </set>
+     where sign_work_no = #{workNo}
+	</update>
+	
+	<!-- 공사 승인후 시공대기중으로 코드변경 -->
+	<update id="updateWorkCode" parameterType="workVO">
+	 update work
+	 set work_code = 'B0101'
+     where work_no = #{workNo}
+	</update>
+	
+	<!-- 공사 삭제 -->
+	<delete id="deleteWork" parameterType="Integer">
+	DELETE work
+	WHERE work_no = #{workNo}
+	</delete>
+	
+	<!-- 공사 삭제 시 번호 정렬 update문 -->
+	<update id="updateDeleteWorkNo" parameterType="Integer">
+	UPDATE work
+	SET work_no = work_no-1
+	WHERE work_no <![CDATA[>]]> #{workNo}
+	</update>
+	
+	<!-- 공사 삭제 시 결재 정보 데이터 삭제 -->
+	<delete id="deleteSign" parameterType="Integer">
+	DELETE work_sign
+	WHERE sign_work_no = #{workNo}
+	</delete>
+	
+	<!-- 공사 삭제 시 결재 정보 번호 정렬 update문 -->
+	<update id="updateDeleteSignNo" parameterType="Integer">
+	UPDATE work_sign
+	SET sign_work_no = sign_work_no-1
+	WHERE sign_work_no <![CDATA[>]]> #{workNo}
+	</update>
+	
+	
+	
+	
+<!-- ############################################################################################  -->
+																		
+<!-- 부품 전체 리스트 -->
+	<select id="getPartList" resultType="workVO">
+		    SELECT TO_NUMBER(replace(part_no, 'MP')) as part_no, e.equip_name as part_Equip_Name,p.part_name,p.part_content,p.part_amount,
+                    find_code_no(p.part_code) as part_code
+		FROM PART p, EQUIP e
+		WHERE p.part_equip_no=e.equip_no
+		order by 1
+	</select>
+	
+<!-- 부품 단건 조회 -->
+	<select id="getPartInfo" parameterType="Integer" resultType="workVO">
+		SELECT p.part_no, p.part_name, e.equip_name as part_equip_name,p.part_content,find_code_no(p.part_code) as part_code
+		FROM equip e, part p
+		Where e.equip_no = p.part_equip_no
+		and part_no = 'MP'||#{value}
+	</select>
+
+</mapper>
