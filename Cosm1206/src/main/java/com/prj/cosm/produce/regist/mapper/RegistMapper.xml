@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.prj.cosm.produce.regist.mapper.RegistMapper">
+
+<!-- 전체조회(오늘자) -->
+<select id="getRegistList" resultType="map">
+	SELECT i.instruct_quantity, r.regist_quantity, r.regist_LOT, r.regist_label, r.regist_error, r.regist_date, r.regist_product_no, r.regist_instruct_no, 
+           c2.code_name as code_no,
+           c1.code_name as inspection,
+           p.plan_order_no
+	FROM produce_instruct i JOIN produce_regist r
+                            ON i.instruct_no = r.regist_instruct_no
+                            JOIN code c1
+                            ON r.inspection = c1.code_no  
+                            JOIN code c2
+                            ON r.code_no = c2.code_no
+                            JOIN produce_plan p
+                            ON i.instruct_plan_no = p.plan_no
+    WHERE TO_DATE(r.regist_date,'rrrr-MM-dd') = TO_DATE(sysdate,'rrrr-MM-dd')
+	ORDER BY r.regist_LOT DESC
+	
+</select>
+
+<!-- 전체조회 -->
+<select id="completeList" resultType="map">
+	SELECT i.instruct_quantity, r.regist_quantity, r.regist_LOT, r.regist_label, r.regist_error, r.regist_date, r.regist_product_no, r.regist_instruct_no, 
+           c2.code_name as code_no,
+           c1.code_name as inspection,
+           p.plan_order_no
+	FROM produce_instruct i JOIN produce_regist r
+                            ON i.instruct_no = r.regist_instruct_no
+                            JOIN code c1
+                            ON r.inspection = c1.code_no  
+                            JOIN code c2
+                            ON r.code_no = c2.code_no
+                            JOIN produce_plan p
+                            ON i.instruct_plan_no = p.plan_no
+    <where>
+	<if test="startDate != null and endDate != null">
+		TRUNC(r.regist_date) BETWEEN #{startDate} AND #{endDate}
+	</if>
+	</where>
+	ORDER BY r.regist_LOT DESC
+	
+</select>
+
+<!-- error 전체조회 -->
+<select id="errorList" resultType="map">
+	SELECT i.instruct_quantity, r.regist_quantity, r.regist_LOT, r.regist_label, r.regist_error, r.regist_date, r.regist_product_no, r.regist_instruct_no, 
+           c2.code_name as code_no,
+           c1.code_name as inspection 
+	FROM produce_instruct i JOIN produce_regist r
+                            ON i.instruct_no = r.regist_instruct_no
+                            JOIN code c1
+                            ON r.inspection = c1.code_no  
+                            JOIN code c2
+                            ON r.code_no = c2.code_no
+	WHERE r.regist_error > 0
+	<if test="startDate != null and endDate != null">
+	AND	TRUNC(r.regist_date) BETWEEN #{startDate} AND #{endDate}
+	</if>
+	ORDER BY r.regist_LOT DESC
+
+</select>
+
+<!-- LOT번호 -->
+<select id="getRegistLOT" resultType="RegistVO">
+	SELECT 'LOT_'||TO_CHAR(SYSDATE,'rrrr')||LPAD(NVL(MAX(SUBSTR(regist_LOT,-4)),0)+1,4,0) as regist_LOT
+	FROM produce_regist WHERE regist_LOT LIKE 'LOT_'||TO_CHAR(SYSDATE,'rrrr')||'%'
+</select>
+
+<!-- 바코드번호 -->
+<select id="getRegistLabel" resultType="RegistVO">
+	SELECT 'BACODE_'||TO_CHAR(SYSDATE,'rrrr')||LPAD(NVL(MAX(SUBSTR(regist_label,-4)),0)+1,4,0) as regist_label
+	FROM produce_regist WHERE regist_label LIKE 'BACODE_'||TO_CHAR(SYSDATE,'rrrr')||'%'
+</select>
+
+<!-- 등록 -->
+<insert id="insertRegist" parameterType="RegistVO">
+	
+	INSERT INTO
+	produce_regist (
+					regist_LOT,
+					regist_quantity,
+					regist_label,
+					regist_error,
+					regist_product_no,
+					regist_instruct_no,
+					code_no,
+					inspection
+					)
+			VALUES (
+					#{registLOT},
+					#{registQuantity},
+					#{registLabel},
+					#{registError},
+					#{registProductNo},
+					#{registInstructNo},
+					find_code_name(#{codeNo}),
+					find_code_name(#{inspection})
+					)	
+</insert>
+
+<delete id="deleteRegist">
+	DELETE FROM produce_regist WHERE regist_LOT = #{registLOT}
+</delete>
+
+<!-- 진행코드 조회 -->
+<select id="getPlayList" resultType="RegistVO">
+	SELECT code_name FROM code
+	WHERE code_adno = 'M01'
+	ORDER BY code_no
+</select>
+<!-- 단위코드 조회 -->
+<select id="getUnitList" resultType="RegistVO">
+	SELECT code_name FROM code
+	WHERE code_adno = 'F01'
+	ORDER BY code_no
+</select>
+
+<!-- 검수완료시 주문서 업데이트 -->
+<update id="updateOrderInfo" parameterType="InsVO">
+	UPDATE orders
+	SET order_code = 'B0109'
+	WHERE order_no = (SELECT p.plan_order_no
+					  FROM produce_instruct i 
+                        	JOIN produce_plan p
+                        	ON i.instruct_plan_no = p.plan_no
+					  WHERE instruct_no = #{instructNo})
+</update>
+
+</mapper>

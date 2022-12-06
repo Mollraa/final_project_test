@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.prj.cosm.produce.bom.mapper.BomMapper">
+
+<!-- 전체조회 -->
+<select id="getBomList" resultType="BomVO">
+	SELECT b.bom_no, b.bom_quantity, m1.m_name, m1.m_info, m1.m_stock, m2.m_name as m_nameb, m2.m_info as m_infob, m2.m_stock as m_stockb, p.goods_name, 
+		   p.goods_standard, p.goods_contents, b.bom_product_no, b.bom_material_no,
+		   b.bom_quantityb, b.bom_material_nob
+	FROM produce_bom b JOIN produce_goods p
+                    	ON b.bom_product_no = p.goods_no
+                   	   JOIN material m1
+                    	ON b.bom_material_no = m1.m_no
+                          JOIN material m2
+                    	ON b.bom_material_nob = m2.m_no
+    ORDER BY bom_no DESC
+</select>
+
+<!-- 제품번호의 bom조회 -->
+<select id="getBomInfo" resultType="BomVO">
+	SELECT b.bom_no, b.bom_quantity, m.m_name, m.m_info, m.m_stock, p.goods_name, 
+		   p.goods_standard, p.goods_contents, b.bom_product_no, b.bom_material_no,
+		   b.bom_quantityb, b.bom_material_nob
+	FROM produce_bom b JOIN produce_goods p
+                    	ON b.bom_product_no = p.goods_no
+                   	   JOIN material m
+                    	ON b.bom_material_no = m.m_no
+    WHERE goods_no = #{goodsNo}
+</select>
+
+
+
+
+<!-- bom번호 -->
+<select id="getBomNo" resultType="BomVO">
+	SELECT 'BOM_'||TO_CHAR(SYSDATE,'rrrr')||LPAD(NVL(MAX(SUBSTR(bom_no,-4)),0)+1,4,0) as bom_no
+	FROM produce_bom WHERE bom_no LIKE 'BOM_'||TO_CHAR(SYSDATE,'rrrr')||'%'
+</select>
+<!-- 등록 -->
+<insert id="insertBom" parameterType="BomVO">
+	INSERT INTO
+	produce_bom (
+				 bom_no,
+				 bom_quantity,
+				 bom_product_no,
+				 bom_material_no,
+				 bom_quantityb,
+				 bom_material_nob
+				 )
+		 VALUES (
+		 		 #{bomNo},
+				 #{bomQuantity},
+				 #{bomProductNo},
+				 #{bomMaterialNo},
+				 #{bomQuantityb},
+				 #{bomMaterialNob}
+		 		 )
+</insert>
+
+<!-- 수정 -->
+<update id="updateBom" parameterType="BomVO">
+	UPDATE produce_bom
+		<set>
+			<if test="bomQuantity != null and !bomQuantity.equals('')">
+				bom_quantity = #{bomQuantity},
+			</if>
+			<if test="bomProductNo != null and !bomProductNo.equals('')">
+				bom_product_no = #{bomProductNo},
+			</if>
+			<if test="bomMaterialNo != null and !bomMaterialNo.equals('')">
+				bom_material_no = #{bomMaterialNo},
+			</if>
+			<if test="bomQuantityb != null and !bomQuantityb.equals('')">
+				bom_quantityb = #{bomQuantityb},
+			</if>
+			<if test="bomMaterialNob != null and !bomMaterialNob.equals('')">
+				bom_material_nob = #{bomMaterialNob},
+			</if>
+		</set>
+	WHERE bom_no = #{bomNo}
+</update>
+
+<!-- 삭제 -->
+<delete id="deleteBom">
+	DELETE FROM produce_bom WHERE bom_no = #{bomNo}
+</delete>
+
+<!-- 자재번호 리스트 -->
+<select id="getMaterialNoList" resultType="BomVO">
+	SELECT m_no, m_name
+	FROM material
+	ORDER BY m_no
+</select>
+
+<!-- 제품번호 리스트 -->
+<select id="getGoodsNoList" resultType="BomVO">
+	SELECT goods_no, goods_name
+	FROM produce_goods
+	ORDER BY goods_no
+</select>
+
+<!-- 생산지시시 자재 insert -->
+<insert id="insertMaterialInfo" parameterType="PlanVO">
+	INSERT INTO material_io (mio_no, mio_date, mio_quantity, mio_progress)
+    				  VALUES( 
+    				 		 (SELECT bom.bom_material_no                                             
+                			  FROM produce_bom bom 
+                			  JOIN produce_plan plan 
+                              ON plan.plan_bom_no = bom.bom_no
+                              JOIN produce_goods goods
+                              ON goods.goods_no = plan.plan_product_no
+                			  WHERE plan_no = #{planNo}),
+                			  sysdate,
+                			 (SELECT (plan.plan_quantity * bom.bom_quantity)/goods.goods_standard as planed_qntt                                             
+                			  FROM produce_bom bom 
+                			  JOIN produce_plan plan 
+                              ON plan.plan_bom_no = bom.bom_no
+                              JOIN produce_goods goods
+                              ON goods.goods_no = plan.plan_product_no
+               				  WHERE plan_no = #{planNo}),
+                		      find_code_name('출고완료'))
+
+</insert>
+
+<!-- 생산지시시 자재2 insert -->
+<insert id="insertMaterialInfo2" parameterType="PlanVO">
+	INSERT INTO material_io (mio_no, mio_date, mio_quantity, mio_progress)
+    				  VALUES( 
+    				 		 (SELECT bom.bom_material_nob                                             
+                			  FROM produce_bom bom 
+                			  JOIN produce_plan plan 
+                              ON plan.plan_bom_no = bom.bom_no
+                              JOIN produce_goods goods
+                              ON goods.goods_no = plan.plan_product_no
+                			  WHERE plan_no = #{planNo}),
+                			  sysdate,
+                			 (SELECT (plan.plan_quantity * bom.bom_quantityb)/goods.goods_standard as planed_qntt                                             
+                			  FROM produce_bom bom 
+                			  JOIN produce_plan plan 
+                              ON plan.plan_bom_no = bom.bom_no
+                              JOIN produce_goods goods
+                              ON goods.goods_no = plan.plan_product_no
+               				  WHERE plan_no = #{planNo}),
+                		      find_code_name('출고완료'))
+
+</insert>
+
+<!-- 자재조회 -->
+<select id="selectMaterialList" resultType="BomVO">
+	SELECT m_no, m_name, m_category, m_stock, find_code_no(m_unit_code) as m_unit_code, m_info
+	FROM material
+</select>
+
+</mapper>

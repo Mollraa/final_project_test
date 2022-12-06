@@ -1,0 +1,154 @@
+.column {
+	float: none;
+	padding-left: 30px;
+}
+
+.margin5 {
+	margin: 5px;
+}
+
+.row:after {
+	content: "";
+	display: table;
+	clear: both;
+	margin: 15px;
+}
+
+.container {
+	margin: 0 auto;
+}
+.smallTd tr td:first-child{
+width: 20%;
+font-size:medium;
+
+}
+
+h2 {
+	font-weight:bold;
+	padding-top: 20px;
+	text-align: center;
+}
+
+h5 {
+	font-weight:bold;
+	float: left;
+}
+
+
+#mySvg {
+	background-color: #d0d0d0;
+	user-select: none;
+
+}
+
+.onBtn {
+	fill: green;
+	animation-iteration-count: infinite;
+	animation-delay: 250ms;
+	animation-name: btncolor;
+	animation-duration : 1s;
+}
+
+@keyframes btncolor {
+  0% {fill : rgb(0, 189, 0)}
+  50% {fill : #00ff00;}
+  100%{fill: rgb(0, 189, 0);}
+}
+
+.offBtn {
+	fill: red;
+}
+
+.pipeOn {
+	stroke: red;
+	animation-iteration-count: infinite;
+	animation-delay: 250ms;
+	animation-name:pipecolor;
+	animation-duration : 1s;
+}
+
+@keyframes pipecolor {
+  0% {stroke : red;}
+  50% {stroke : hotpink;}
+  100%{stroke: red;}
+}
+
+.pipeOff {
+	stroke: black;
+}
+
+.texts:hover {
+	cursor: pointer;
+}
+.emp tr td, .emp tr, .emp {
+ 	border:1px solid #ced4da;
+ 	text-align: center;
+ 	font-size: medium;
+ 	 border-collapse: separate;	
+ }
+ 
+.signImage{
+	
+width: 50px;
+height: 50px;
+visibility: hidden;
+
+}
+
+ 
+ .picker{
+ border-radius: 0.25rem;
+ }
+ 
+ .pickerDiv{
+ border-radius: 0.25rem;
+ border-color: #ced4da;
+ width: 100%;
+ }
+ 
+ .Wpicker {
+ width: 47.5%;
+  border-radius: 0.25rem;
+ border-color: #ced4da;
+ }
+ 
+
+ .Tpicker {
+  width: 100%; 
+  border-radius: 0.25rem;
+  border-color: #ced4da;
+
+ }
+
+.textarea {
+    width: 100%;
+    resize: none;
+    font-size: small;
+    height: 83px;
+   
+}
+
+/* select option[value=""][disabled] {
+	display: none;
+} */
+ 
+input::placeholder {
+  font-size: small;
+  
+}
+
+.filterInput {
+	
+	float: left; 
+	width:130px; 
+	font-size:12px;
+	height:31px;
+	margin-right: 5px;
+	border: 1px solid #aaa;
+
+}
+
+/* tr td:nth-child(2) {
+   width: 50%; 
+ }
+ */

@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/layout}">
+
+<head>
+<meta charset="UTF-8">
+
+<title>Insert title here</title>
+
+<link href="/css/tabcss/tabcss.css" rel="stylesheet" />
+</head>
+
+<body id="Context">
+
+	<div layout:fragment="content">
+	
+		<!-- tab기능 -->
+		<div class="tabs">
+			<input id="all" type="radio" name="tab_item" checked> <label
+				class="tab_item" for="all">생산계획</label> <input id="programming"
+				type="radio" name="tab_item"> <label class="tab_item"
+				for="programming">BOM 정보</label> <input id="design" type="radio"
+				name="tab_item"> <label class="tab_item" for="design">제품
+				정보</label>
+
+			<div class="tab_content" id="all_content" style="margin-left: 50px; margin-right: 50px;">
+				<h3>미계획 주문서 리스트</h3>
+				<button type="button" class="btn btn-dark btn-sm"
+					onclick="insertData();" data-bs-toggle="modal" id="selectBtn"
+					data-bs-target="#requestModal" style="float: right">생산계획
+					작성</button>
+				<div id="grid"></div>
+
+
+				<hr style="width: 100%">
+				<h3>생산계획 리스트</h3>
+				<button type="button" class="btn btn-dark btn-sm"
+					style="float: right" id="delbtn">생산계획 삭제</button>
+				<button type="button" onclick="updateData();" id="updateBtn"
+					class="btn btn-dark btn-sm" data-bs-toggle="modal"
+					data-bs-target="#requestModala" style="float: right">생산계획
+					수정</button>
+				<button type="button" onclick="getPlanInfo();" id="selectInfo"
+					class="btn btn-dark btn-sm" data-bs-toggle="modal"
+					data-bs-target="#requestModalb" style="float: right">생산계획
+					상세조회</button>
+				<div id="grid2"></div>
+				<button type="button"
+					onclick="location.href='/produce/instructList'"
+					class="btn btn-dark btn-sm"
+					style="float: right; margin-right: 36px">생산지시 페이지 이동</button>
+			</div>
+
+			<div class="tab_content" id="programming_content" style="margin-left: 50px; margin-right: 50px;">
+				<h3>BOM 정보</h3>
+				<div id="grid3"></div>
+				<button type="button" onclick="location.href='/produce/bom'"
+					class="btn btn-dark btn-sm"
+					style="float: right; margin-right: 36px">BOM 페이지 이동</button>
+			</div>
+			<div class="tab_content" id="design_content" style="margin-left: 50px; margin-right: 50px;">
+				<h3>제품 정보</h3>
+				<div id="grid4"></div>
+				<button type="button" onclick="location.href='/produce/goods'"
+					class="btn btn-dark btn-sm"
+					style="float: right; margin-right: 36px">제품 페이지 이동</button>
+			</div>
+
+		</div>
+
+		<!-- 생산계획 작성 모달 -->
+		<div class="modal fade" id="requestModal" tabindex="-1"
+			aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-l">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">생산계획서 작성</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<form action="/produce/planInsert" method="post" id="insertFrm">
+						<!-- <sec:csrfInput/> -->
+						<input type="hidden" th:name="${_csrf.parameterName}"
+							th:value="${_csrf.token}" />
+						<div class="modal-body">
+							<div>
+								<div class="input-group mb-3">
+									<span class="input-group-text">생산계획번호</span> <input type="text"
+										class="form-control" id="planNoInput" name="planNo"
+										aria-label="Username" aria-describedby="basic-addon1"
+										readonly="readonly">
+								</div>
+								<div class="input-group mb-3">
+									<span class="input-group-text">주문번호</span> <input type="text"
+										class="form-control" id="orderNo" name="planOrderNo"
+										aria-label="Username" aria-describedby="basic-addon1"
+										readonly="readonly">
+								</div>
+								<div class="input-group mb-3">
+									<span class="input-group-text">제품번호</span> <input ty
+										data-bs-dismiss="modal" id="selectGoods" name="planProductNo"
+										class="form-control">
+
+								</div>
+								<div class="input-group mb-3">
+									<span class="input-group-text">제품명</span> <input type="text"
+										class="form-control" id="goodsName" name="goodsName"
+										aria-label="Username" aria-describedby="basic-addon1"
+										readonly="readonly">
+								</div>
+
+								<div class="input-group mb-3">
+									<span class="input-group-text">BOM번호 </span> <input type="text"
+										data-bs-dismiss="modal" id="selectBom" name="planBomNo"
+										class="form-control" readonly="readonly">
+
+								</div>
+								<div class="input-group mb-3">
+									<span class="input-group-text">생산량</span> <input type="number"
+										class="form-control" name="planQuantity" id="planQuantity"
+										aria-label="Username" aria-describedby="basic-addon2"
+										readonly="readonly">
+								</div>
+								<div class="input-group mb-3">
+									<span class="input-group-text">주문일자</span> <input type="date"
+										class="form-control" name="orderDate" id="orderDate"
+										aria-label="Username" aria-describedby="basic-addon3"
+										readonly="readonly">
+								</div>
+
+								<div class="input-group mb-3">
+									<span class="input-group-text">납기일자</span> <input type="date"
+										class="form-control" name="deliveryDate" id="deliveryDate"
+										aria-label="Username" aria-describedby="basic-addon3"
+										readonly="readonly">
+								</div>
+
+								<div class="input-group mb-3">
+									<span class="input-group-text">시작일자</span> <input type="date"
+										class="form-control" name="planStart" id="planStart"
+										aria-label="Username" aria-describedby="basic-addon3">
+								</div>
+
+								<div class="input-group mb-3">
+									<span class="input-group-text">종료일자</span> <input type="date"
+										class="form-control" name="planEnd" id="planEnd"
+										aria-label="Username" aria-describedby="basic-addon4">
+								</div>
+
+
+								<div class="input-group">
+									<span class="input-group-text">기타사항</span>
+									<textarea class="form-control" name="planEx"
+										aria-label="With textarea"></textarea>
+								</div>
+
+								<div id="requestModalGrid" style="width: 100%;"></div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-primary" id="alertStart">등록</button>
+							<button type="button" class="btn btn-secondary"
+								data-bs-dismiss="modal">취소</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<!-- 생산계획 수정 모달 -->
+		<div class="modal fade" id="requestModala" tabindex="-1"
+			aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-l">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">생산계획서 수정</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<form action="/produce/planUpdate" method="post" id="insertFrm2">
+						<!-- <sec:csrfInput/> -->
+						<input type="hidden" th:name="${_csrf.parameterName}"
+							th:value="${_csrf.token}" />
+						<div class="modal-body">
+							<div>
+								<div class="input-group mb-3">
+									<span class="input-group-text">생산계획번호</span> <input type="text"
+										class="form-control" id="planNo2" name="planNo"
+										aria-label="Username" aria-describedby="basic-addon1"
+										readonly="readonly">
+								</div>
+								<div class="input-group mb-3">
+									<span class="input-group-text">주문번호</span> <input type="text"
+										class="form-control" id="planOrderNo2" name="planOrderNo"
+										aria-label="Username" aria-describedby="basic-addon1"
+										readonly="readonly">
+								</div>
+								<div class="input-group mb-3">
+									<span class="input-group-text">제품번호</span> <input type="text"
+										class="form-control" id="planProductNo2" name="planProductNo"
+										aria-label="Username" aria-describedby="basic-addon1"
+										readonly="readonly">
+								</div>
+								<div class="input-group mb-3">
+									<span class="input-group-text">BOM번호 </span> <input type="text"
+										data-bs-dismiss="modal" id="selectBom2" name="planBomNo"
+										class="form-control" readonly="readonly">
+
+								</div>
+
+								<div class="input-group mb-3">
+									<span class="input-group-text">생산량</span> <input type="number"
+										class="form-control" id="planQuantity2" name="planQuantity"
+										aria-label="Username" aria-describedby="basic-addon2"
+										readonly="readonly">
+								</div>
+
+								<div class="input-group mb-3">
+									<span class="input-group-text">시작일자</span> <input type="date"
+										class="form-control" placeholder="시작일자" name="planStart"
+										id="planStart2" aria-label="Username"
+										aria-describedby="basic-addon3">
+								</div>
+
+								<div class="input-group mb-3">
+									<span class="input-group-text">종료일자</span> <input type="date"
+										class="form-control" placeholder="종료일자" name="planEnd"
+										id="planEnd2" aria-label="Username"
+										aria-describedby="basic-addon4">
+								</div>
+
+
+								<div class="input-group">
+									<span class="input-group-text">기타사항</span>
+									<textarea class="form-control" name="planEx" id="planEx2"
+										aria-label="With textarea"></textarea>
+								</div>
+
+								<div id="requestModalGrid" style="width: 100%;"></div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-primary" id="alertStart2">수정</button>
+							<button type="button" class="btn btn-secondary"
+								data-bs-dismiss="modal">취소</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<!-- 생산계획 상세조회 모달 -->
+
+		<div class="modal fade" id="requestModalb" tabindex="-1"
+			aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-l">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">생산계획서 상세조회</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<!-- <sec:csrfInput/> -->
+					<input type="hidden" th:name="${_csrf.parameterName}"
+						th:value="${_csrf.token}" />
+					<div class="modal-body">
+						<div>
+							<div class="input-group mb-3">
+								<span class="input-group-text">생산계획번호</span> <input type="text"
+									class="form-control" id="planNo3" name="planNo"
+									aria-label="Username" aria-describedby="basic-addon1"
+									readonly="readonly">
+							</div>
+							<div class="input-group mb-3">
+								<span class="input-group-text">주문번호</span> <input type="text"
+									class="form-control" id="planOrderNo3" name="planOrderNo"
+									aria-label="Username" aria-describedby="basic-addon1"
+									readonly="readonly">
+							</div>
+							<div class="input-group mb-3">
+								<span class="input-group-text">제품번호</span> <input type="text"
+									class="form-control" id="planProductNo3" name="planProductNo"
+									aria-label="Username" aria-describedby="basic-addon1"
+									readonly="readonly">
+							</div>
+							<div class="input-group mb-3">
+								<span class="input-group-text">제품이름</span> <input type="text"
+									class="form-control" id="goodsName3" name="goodsName"
+									aria-label="Username" aria-describedby="basic-addon1"
+									readonly="readonly">
+							</div>
+							<div class="input-group mb-3">
+								<span class="input-group-text">제품기준수량</span> <input
+									type="number" class="form-control" id="goodsStandard3"
+									name="goodsStandard" aria-label="Username"
+									aria-describedby="basic-addon1" readonly="readonly">
+							</div>
+							<div class="input-group mb-3">
+								<span class="input-group-text">제품설명</span> <input type="text"
+									class="form-control" id="goodsContents3" name="goodsContents"
+									aria-label="Username" aria-describedby="basic-addon1"
+									readonly="readonly">
+							</div>
+							<div class="input-group mb-3">
+								<span class="input-group-text">제품검수기준</span> <input type="text"
+									class="form-control" id="goodsCheck3" name="goodsCheck"
+									aria-label="Username" aria-describedby="basic-addon1"
+									readonly="readonly">
+							</div>
+							<div class="input-group mb-3">
+								<span class="input-group-text">제품제작기간</span> <input type="text"
+									class="form-control" id="goodsDate3" name="goodsDate"
+									aria-label="Username" aria-describedby="basic-addon1"
+									readonly="readonly">
+							</div>
+
+							<div class="input-group mb-3">
+								<span class="input-group-text">BOM번호</span> <input type="text"
+									class="form-control" id="planBomNo3" name="planBomNo"
+									aria-label="Username" aria-describedby="basic-addon2"
+									readonly="readonly">
+							</div>
+							<div class="input-group mb-3">
+								<span class="input-group-text">BOM 자재투입량</span> <input
+									type="number" class="form-control" id="bomQuantity3"
+									name="bomQuantity" aria-label="Username"
+									aria-describedby="basic-addon2" readonly="readonly">
+							</div>
+							<div class="input-group mb-3">
+								<span class="input-group-text">생산량</span> <input type="number"
+									class="form-control" id="planQuantity3" name="planQuantity"
+									aria-label="Username" aria-describedby="basic-addon2"
+									readonly="readonly">
+							</div>
+
+							<div class="input-group mb-3">
+								<span class="input-group-text">시작일자</span> <input type="date"
+									class="form-control" placeholder="시작일자" name="planStart"
+									id="planStart3" aria-label="Username"
+									aria-describedby="basic-addon3" readonly="readonly">
+							</div>
+
+							<div class="input-group mb-3">
+								<span class="input-group-text">종료일자</span> <input type="date"
+									class="form-control" placeholder="종료일자" name="planEnd"
+									id="planEnd3" aria-label="Username"
+									aria-describedby="basic-addon4" readonly="readonly">
+							</div>
+
+
+							<div class="input-group">
+								<span class="input-group-text">기타사항</span>
+								<textarea class="form-control" name="planEx" id="planEx3"
+									aria-label="With textarea" readonly="readonly"></textarea>
+							</div>
+
+							<div id="requestModalGrid" style="width: 100%;"></div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- bom 모달에 모달 -->
+		<div class="modal fade" id="requestModal3" tabindex="-1"
+			aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-xl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">BOM 상세정보</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div id="grid5"></div>
+						<div id="requestModalGrid" style="width: 100%;"></div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" id="setData"
+								data-bs-dismiss="modal">확인</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 제품 모달에 모달 -->
+		<div class="modal fade" id="requestModal4" tabindex="-1"
+			aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-xl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">제품 상세정보</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div id="grid6"></div>
+						<div id="requestModalGrid" style="width: 100%;"></div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" id="setData1"
+								data-bs-dismiss="modal">확인</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 수정 bom 모달에 모달 -->
+		<div class="modal fade" id="requestModal5" tabindex="-1"
+			aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-xl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">BOM 상세정보</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div id="grid7"></div>
+						<div id="requestModalGrid" style="width: 100%;"></div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" id="setData2"
+								data-bs-dismiss="modal">확인</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script>
+		
+            $("#setData").click(function () {
+            	$('#requestModal').modal('toggle');
+            	$('#selectBtn').click();	
+            	var datas = grid5.getCheckedRows();
+            	$('#selectBom').val(datas[0].bomNo);
+            
+            })
+            $("#setData1").click(function () {
+            	$('#requestModal').modal('toggle');
+            	$('#selectBtn').click();	
+            	var datas = grid6.getCheckedRows();
+            	$('#selectGoods').val(datas[0].goodsNo);
+            
+            })
+            
+            $("#setData2").click(function () {
+            	
+            	$('#updateBtn').click();	
+            	var datas = grid7.getCheckedRows();
+            	$('#selectBom2').val(datas[0].bomNo);
+            
+            })
+         
+	
+		window.onload = function () {
+			
+			
+			//생산계획리스트 불러오기
+			planList();
+			orderList();
+			bomList();
+			goodsList();
+			bomList2();
+			goodsList2();
+			
+			
+			
+			//체크박스 하나만 선택
+			grid.on('check', (ev) => {
+				for(let i=0;i<$('#grid input:checkbox[name="_checked"]').length;i++){
+					if(i!=`${ev.rowKey}`){
+						grid.uncheck(i);
+					}
+				}
+				for(let i=0;i<$('#grid2 input:checkbox[name="_checked"]').length;i++){
+					grid2.uncheck(i);
+				}
+				// 생산계획번호 +1 로 등록
+				var info = '[[${info.planNo}]]';
+				$('#planNoInput').val(info)	
+				$('#selectBtn').prop('disabled', false);
+			});
+
+			grid2.on('check', (ev) => {
+				for(let i=0;i<$('#grid input:checkbox[name="_checked"]').length;i++){
+					grid.uncheck(i);
+				}
+				for(let i=0;i<$('#grid2 input:checkbox[name="_checked"]').length;i++){
+					if(i!=`${ev.rowKey}`){
+						grid2.uncheck(i);
+						$('#updateBtn').prop('disabled', false);
+						$('#selectInfo').prop('disabled', false);
+						$('#delbtn').prop('disabled', false);
+					}
+				}
+			});
+			
+			grid5.on('check', (ev) => {
+				for(let i=0;i<$('#grid5 input:checkbox[name="_checked"]').length;i++){
+					if(i!=`${ev.rowKey}`){
+						grid5.uncheck(i);
+					}
+				}
+				// 생산계획번호 +1 로 등록
+				var info = '[[${info.planNo}]]';
+				$('#planNoInput').val(info)	
+			});
+			
+			grid7.on('check', (ev) => {
+			
+				for(let i=0;i<$('#grid2 input:checkbox[name="_checked"]').length;i++){
+					if(i!=`${ev.rowKey}`){
+						grid7.uncheck(i);
+					}
+				}
+			});
+			
+			grid6.on('check', (ev) => {
+				
+				for(let i=0;i<$('#grid6 input:checkbox[name="_checked"]').length;i++){
+					if(i!=`${ev.rowKey}`){
+						grid6.uncheck(i);
+					}
+				}
+			});
+				
+			grid.on('uncheck', (ev) => {
+				$('input:text').val('');
+				$('#selectBtn').prop('disabled', true);
+				
+			});
+			$('#selectBtn').prop('disabled', true);	
+			
+			grid2.on('uncheck', (ev) => {
+				$('input:text').val('');
+				$('#updateBtn').prop('disabled', true);
+				$('#selectInfo').prop('disabled', true);
+				$('#delbtn').prop('disabled', true);
+			});
+			$('#updateBtn').prop('disabled', true);
+			$('#selectInfo').prop('disabled', true);
+			$('#delbtn').prop('disabled', true);
+			
+			grid5.on('uncheck', (ev) => {
+				$('input:text').val('');
+			});
+			
+			grid6.on('uncheck', (ev) => {
+				$('input:text').val('');
+			});
+			
+			grid7.on('uncheck', (ev) => {
+				$('input:text').val('');
+			});
+				
+			$('#grid span').remove();
+			$('#grid2 span').remove();
+			$('#grid5 span').remove();
+			$('#grid6 span').remove();
+			$('#grid7 span').remove();
+			
+			$(window).on('mouseover',function(){
+				grid5.refreshLayout();
+				grid6.refreshLayout();
+				grid7.refreshLayout();
+			})
+
+			
+		
+		};
+			
+		
+		// 생산계획 리스트 그리드
+		var grid2 = new tui.Grid({
+			el: document.getElementById('grid2'),
+			rowHeaders: ['checkbox'],
+			minBodyHeight: 30,
+			pageOptions: {
+				useClient: true, // front에서만 페이징 하는 속성
+				perPage: 5
+			},
+			
+			scrollX: false,
+			scrollY: false,
+			columns: [
+				{
+					header: '생산계획번호',
+					name: 'planNo',
+					align : 'center'
+				},
+				{
+					header: '주문번호',
+					name: 'planOrderNo',
+					align : 'center'
+				},
+				{
+					header: '생산량',
+					name: 'planQuantity',
+					width : 130,
+					align : 'center'
+				},
+				{
+					header: '시작일자(desc)',
+					name: 'planStart',
+					sortingType: 'desc',
+					sortable: true,
+					align : 'center'
+				},
+				{
+					header: '종료일자(desc)',
+					name: 'planEnd',
+					sortingType: 'desc',
+					sortable: true,
+					align : 'center'
+				},
+				
+				{
+					header: '제품번호',
+					name: 'planProductNo',
+					align : 'center'
+				},	
+				{
+					header: '진행상황',
+					name: 'planPlayCode',
+					align : 'center',
+					renderer : {
+						styles: {
+								 fontWeight: 'bold',
+								 color: (props) => props.value == '자재입고 대기중' ? 'red' : 'blue'
+							}
+					},
+					width : 160
+				},	
+				{
+					header: '기타사항',
+					name: 'planEx',
+					align : 'center'
+				},	
+				]
+			});
+		
+		//주문서 리스트 그리드
+		 var grid = new tui.Grid({
+			el: document.getElementById('grid'),
+			rowHeaders: ['checkbox'],
+			minBodyHeight: 30,
+			pageOptions: {
+				useClient: true, // front에서만 페이징 하는 속성
+				perPage: 5
+			},
+			scrollX: false,
+			scrollY: false,
+			columns: [{
+				header: '주문번호',
+				name: 'orderNo',
+				align : 'center'
+			}, 
+			   {
+				header: '제품번호',
+				name: 'goodsNo',
+				align : 'center'
+			}, 
+			{
+				header: '제품명',
+				name: 'goodsName',
+				align : 'center'
+			},
+			{
+				header: '주문일자',
+				name: 'orderDate',
+				align : 'center'
+			}, {
+				header: '납기일자',
+				name: 'deliveryDate',
+				align : 'center'
+			},  {
+				header: '수량',
+				name: 'totalNum',
+				align : 'center'
+			},  {
+				header: '요청사항',
+				name: 'note',
+				align : 'center'
+			}, {
+				header: '주문상태',
+				name: 'orderCode',
+				align : 'center'
+			}]
+			});
+		
+		//BOM 리스트 그리드
+		 var grid3 = new tui.Grid({
+			 
+			el: document.getElementById('grid3'),
+			minBodyHeight: 30,
+			pageOptions: {
+				useClient: true, // front에서만 페이징 하는 속성
+				perPage: 5
+			},
+			
+			scrollX: false,
+			scrollY: false,
+			columns: [
+				{
+					header: 'BOM번호',
+					name: 'bomNo',
+					align : 'center',
+					filter: {
+					       type: 'select',
+					        showApplyBtn: true,
+					        showClearBtn: true
+					      },
+				},
+				
+				{
+					header: '제품이름',
+					name: 'goodsName',
+					align : 'center'
+				},
+				{
+					header: '제품기준수량',
+					name: 'goodsStandard',
+					align : 'center'
+				},
+			
+				{
+					header: '자재번호(1)',
+					name: 'bomMaterialNo',
+					align : 'center'
+				},	
+				{
+					header: '자재명(1)',
+					name: 'mname',
+					align : 'center'
+				},	
+				{
+					header: '자재 투입량(1)',
+					name: 'bomQuantity',
+					align : 'center'
+				},
+				{
+					header: '자재번호(2)',
+					name: 'bomMaterialNob',
+					align : 'center'
+				},	
+				{
+					header: '자재명(2)',
+					name: 'mname',
+					align : 'center'
+				},	
+				{
+					header: '자재 투입량(2)',
+					name: 'bomQuantityb',
+					align : 'center'
+				},
+				
+				],
+			});
+		//모달에 모달 BOM 리스트 그리드
+		 var grid5 = new tui.Grid({
+			 
+			el: document.getElementById('grid5'),
+			minBodyHeight: 30,
+			rowHeaders: ['checkbox'],
+			pageOptions: {
+				useClient: true, // front에서만 페이징 하는 속성
+				perPage: 10
+			},
+			
+			scrollX: false,
+			scrollY: false,
+			columns: [
+				{
+					header: 'BOM번호',
+					name: 'bomNo',
+					align : 'center',
+					filter: {
+					       type: 'select',
+					        showApplyBtn: true,
+					        showClearBtn: true
+					      },
+				},
+				{
+					header: '투입량',
+					name: 'bomQuantity',
+					align : 'center'
+				},
+				{
+					header: '제품번호',
+					name: 'bomProductNo',
+					align : 'center',
+					renderer : {
+						styles: {
+								 fontWeight: 'bold',
+								 color: (props) => props.value.length > 3 ? 'blue' : 'blue'
+							}
+					},
+				},
+				
+				{
+					header: '제품이름',
+					name: 'goodsName',
+					align : 'center'
+				},
+				{
+					header: '제품기준수량',
+					name: 'goodsStandard',
+					align : 'center'
+				},
+				{
+					header: '제품상세정보',
+					name: 'goodsContents',
+					align : 'center'
+				},
+				{
+					header: '자재번호',
+					name: 'bomMaterialNo',
+					align : 'center'
+				},	
+				{
+					header: '자재명',
+					name: 'mname',
+					align : 'center'
+				},	
+				{
+					header: '자재재고량',
+					name: 'mstock',
+					align : 'center'
+				},	
+				{
+					header: '자재상세정보',
+					name: 'minfo',
+					align : 'center'
+				},	
+				],
+			});
+		
+		//수정 모달에 모달 BOM 리스트 그리드
+		 var grid7 = new tui.Grid({
+			 
+			el: document.getElementById('grid7'),
+			minBodyHeight: 30,
+			rowHeaders: ['checkbox'],
+			pageOptions: {
+				useClient: true, // front에서만 페이징 하는 속성
+				perPage: 10
+			},
+			
+			scrollX: false,
+			scrollY: false,
+			columns: [
+				{
+					header: 'BOM번호',
+					name: 'bomNo',
+					filter: {
+					       type: 'select',
+					        showApplyBtn: true,
+					        showClearBtn: true
+					      },
+					align : 'center'
+				},
+				{
+					header: '투입량',
+					name: 'bomQuantity',
+					align : 'center'
+				},
+				{
+					header: '제품번호',
+					name: 'bomProductNo',
+					align : 'center'
+				},
+				
+				{
+					header: '제품이름',
+					name: 'goodsName',
+					align : 'center'
+				},
+				{
+					header: '제품기준수량',
+					name: 'goodsStandard',
+					align : 'center'
+				},
+				{
+					header: '제품상세정보',
+					name: 'goodsContents',
+					align : 'center'
+				},
+				{
+					header: '자재번호',
+					name: 'bomMaterialNo',
+					align : 'center'
+				},	
+				{
+					header: '자재명',
+					name: 'mname',
+					align : 'center'
+				},	
+				{
+					header: '자재재고량',
+					name: 'mstock',
+					align : 'center'
+				},	
+				{
+					header: '자재상세정보',
+					name: 'minfo',
+					align : 'center'
+				},	
+				],
+			});
+		
+		//제품정보 리스트 그리드
+		 var grid4 = new tui.Grid({
+			 
+			el: document.getElementById('grid4'),
+			minBodyHeight: 30,
+			pageOptions: {
+				useClient: true, // front에서만 페이징 하는 속성
+				perPage: 5
+			},
+			
+			scrollX: false,
+			scrollY: false,
+			columns : [ {
+				header : '제품번호',
+				name : 'goodsNo',
+				align : 'center',
+				filter : {
+					type : 'select',
+					showApplyBtn : true,
+					showClearBtn : true
+				},
+			}, {
+				header : '제품명',
+				name : 'goodsName',
+				align : 'center'
+			}, {
+				header : '제품기준수량',
+				name : 'goodsStandard',
+				align : 'center'
+			}, {
+				header : '제품설명',
+				name : 'goodsContents',
+				align : 'center'
+			}, {
+				header : '제품검수기준',
+				name : 'goodsCheck',
+				align : 'center'
+			}, {
+				header : '제작기간',
+				name : 'goodsDate',
+				align : 'center'
+			}, {
+				header : '단위코드',
+				name : 'unitCode',
+				align : 'center'
+			}, ],
+
+			});
+		
+		//모달에 모달 제품정보 리스트 그리드
+		 var grid6 = new tui.Grid({
+			 
+			el: document.getElementById('grid6'),
+			minBodyHeight: 30,
+			rowHeaders: ['checkbox'],
+			pageOptions: {
+				useClient: true, // front에서만 페이징 하는 속성
+				perPage: 10
+			},
+			
+			scrollX: false,
+			scrollY: false,
+			columns : [ {
+				header : '제품번호',
+				name : 'goodsNo',
+				align : 'center',
+				filter : {
+					type : 'select',
+					showApplyBtn : true,
+					showClearBtn : true
+				},
+			}, {
+				header : '제품명',
+				name : 'goodsName',
+				align : 'center',
+			}, {
+				header : '제품기준수량',
+				name : 'goodsStandard',
+				align : 'center',
+			}, {
+				header : '제품설명',
+				name : 'goodsContents',
+				align : 'center',
+			}, {
+				header : '제품검수기준',
+				name : 'goodsCheck',
+				align : 'center',
+			}, {
+				header : '제작기간',
+				name : 'goodsDate',
+				align : 'center'
+			}, {
+				header : '단위코드',
+				name : 'unitCode',
+				align : 'center'
+			}, ],
+
+			});
+		 //주문서 리스트 불러오기
+		 function orderList(){
+			 $.ajax({
+					url: "/produce/selectOrderList",
+					method: "GET",
+					dataType: "JSON",
+					success: function (result) {
+						console.log(result)
+						for (let order of result) {
+							order.orderDate = order.orderDate.substr(0, 10);
+							order.deliveryDate = order.deliveryDate.substr(0, 10);
+						}
+						grid.resetData(result);
+					},
+					error: function (reject) {
+						console.log(reject);
+					}
+
+				});
+		 }
+		
+		
+		 //생산계획리스트 불러오기
+		 function planList(){	
+			$.ajax({
+					url: "/produce/plan",
+					method: "GET",
+					dataType: "JSON",
+					success: function (result) {
+						for (let plan of result) {
+							plan.planStart = plan.planStart.substr(0, 10);
+							plan.planEnd = plan.planEnd.substr(0, 10);
+						}
+						grid2.resetData(result);
+					},
+					error: function (reject) {
+						console.log(reject);
+					}
+			});
+		}
+		// bom리스트 불러오기
+			function bomList(){
+				$.ajax({
+					url: "/produce/bomList",
+					method: "GET",
+					dataType: "JSON",
+					success: function (result) {
+						console.log(result);
+						grid3.resetData(result);
+					},
+					error: function (reject) {
+						console.log(reject);
+					}
+			});
+			}
+		function bomList2(){
+			$.ajax({
+				url: "/produce/bomList",
+				method: "GET",
+				dataType: "JSON",
+				success: function (result) {
+					console.log(result)
+					grid7.resetData(result);
+					grid5.resetData(result);
+				},
+				error: function (reject) {
+					console.log(reject);
+				}
+		});
+		}	
+			// 제품리스트 불러오기
+			function goodsList() {
+				$.ajax({
+					url : "/produce/goodsList",
+					method : "GET",
+					dataType : "JSON",
+					success : function(result) {
+						grid4.resetData(result);
+					},
+					error : function(reject) {
+						console.log(reject);
+					}
+				});
+			}
+			// 제품리스트 불러오기2
+			function goodsList2() {
+				$.ajax({
+					url : "/produce/goodsList",
+					method : "GET",
+					dataType : "JSON",
+					success : function(result) {
+						grid6.resetData(result);
+					},
+					error : function(reject) {
+						console.log(reject);
+					}
+				});
+			}
+			//생산계획 상세정보
+			function getPlanInfo(){
+				var datas = grid2.getCheckedRows();
+				var test = JSON.stringify(datas);
+				console.log(datas);
+				for(plan of datas){
+					$.ajax({
+						url : '/produce/getPlanInfo',
+						type : 'get',
+						data : {planNo : plan.planNo},
+						success : function(data){
+							data.planStart = data.planStart.substr(0, 10);
+							data.planEnd = data.planEnd.substr(0, 10);
+							console.log(data);
+							document.querySelector('#planNo3').value=data.planNo;
+							document.querySelector('#planQuantity3').value=data.planQuantity;
+							document.querySelector('#planStart3').value=data.planStart;
+							document.querySelector('#planEnd3').value=data.planEnd;
+							document.querySelector('#planEx3').value=data.planEx;
+							document.querySelector('#planOrderNo3').value=data.planOrderNo;
+							document.querySelector('#planProductNo3').value=data.planProductNo;
+							document.querySelector('#planBomNo3').value=data.planBomNo;
+							document.querySelector('#bomQuantity3').value=data.bomQuantity;
+							document.querySelector('#goodsName3').value=data.goodsName;
+							document.querySelector('#goodsStandard3').value=data.goodsStandard;
+							document.querySelector('#goodsContents3').value=data.goodsContents;
+							document.querySelector('#goodsCheck3').value=data.goodsCheck;
+							document.querySelector('#goodsDate3').value=data.goodsDate;
+							
+						},
+						error : function(reject){
+							console.log(reject);
+						}
+					});
+				}
+			}
+		//tab기능할때 grid 깨지는 거 방지
+		const selectMno = document.getElementById('programming');
+			selectMno.addEventListener('click',function(){
+			grid4.refreshLayout();
+			grid3.refreshLayout();
+				
+			})
+		const selectMno2 = document.getElementById('design');
+			selectMno2.addEventListener('click',function(){
+			grid4.refreshLayout();
+			grid3.refreshLayout();
+			})
+		const selectMno3 = document.getElementById('selectBom');
+			selectMno3.addEventListener('click',function(){
+				$('#requestModal3').modal('toggle');
+			})
+		const selectMno4 = document.getElementById('selectGoods');
+			selectMno4.addEventListener('click',function(){
+				$('#requestModal4').modal('toggle');
+			})
+		const selectMno5 = document.getElementById('selectBom2');
+			selectMno5.addEventListener('click',function(){
+				$('#requestModal5').modal('toggle');
+			})
+
+		//등록
+		function insertData() {
+			var planData=[];
+			var datas = grid.getCheckedRows();
+			console.log(datas);
+			var test = JSON.stringify(datas);
+			$('#orderNo').val(datas[0].orderNo);
+			$('#selectGoods').val(datas[0].goodsNo);
+			$('#orderDate').val(datas[0].orderDate);
+			$('#productName').val(datas[0].productName);
+			$('#deliveryDate').val(datas[0].deliveryDate);
+			$('#goodsName').val(datas[0].goodsName);
+			$('#totalNum').val(datas[0].totalNum);
+			$('#selectBom').val(datas[0].bomNo);
+			$('#planStart').val(datas[0].orderDate);
+			$('#planEnd').val(datas[0].deliveryDate);
+			$('#planQuantity').val(datas[0].totalNum);
+			$('#planProductNo').val(datas[0].goodsNo);
+			$('#planStart').attr('min', datas[0].orderDate);
+			$('#planStart').attr('max', datas[0].deliveryDate);
+			$('#planEnd').attr('min', datas[0].orderDate);
+			$('#planEnd').attr('max', datas[0].deliveryDate);
+		}
+		
+			
+		//생산계획 등록 확인창
+		$().ready(function () {
+			$("#alertStart").click(function () {
+
+				
+				if ($('#planStart').val() == "" || $('#planStart').val() == null) {
+					Swal.fire({
+                        icon: 'warning',
+                        title: '시작일자를 입력하세요!',
+                    })
+					return false;
+				}
+				if ($('#planEnd').val() == "" || $('#planEnd').val() == null) {
+					Swal.fire({
+                        icon: 'warning',
+                        title: '종료일자를 입력하세요!',
+                    })
+					return false;
+				}
+				
+	               Swal.fire({
+	                   icon: 'success',
+	                   title: '생산계획 등록이 완료되었습니다.',
+	                   text: 'success~',
+	               }).then(function(){
+	            	   var datas2 = grid.getCheckedRows();
+                   		console.log(datas2);
+                   		for(plan of datas2){
+               				$.ajax({
+               					url : '/produce/updateOrderInfo',
+               					type : 'post',
+	               				data : {orderNo : plan.orderNo},
+	               				beforeSend: function (xhr) {
+	           						xhr.setRequestHeader(header, token);
+	           					},
+	               				success : function(data){
+	               					console.log(data);
+	               					$('#insertFrm').submit();
+	               				},
+	               				error : function(reject){
+	               					console.log(reject);
+	               				}
+	               			});
+	               			
+	                  	 }
+	            	   
+	              });
+	                   return false;	                
+	           });
+	     });
+		
+		
+		//수정
+		function updateData() {
+			
+			var planData=[];
+			var datas = grid2.getCheckedRows();
+			var test = JSON.stringify(datas);
+			$('#planNo2').val(datas[0].planNo);	
+			$('#planQuantity2').val(datas[0].planQuantity);
+			$('#planStart2').val(datas[0].planStart);
+			$('#planEnd2').val(datas[0].planEnd);
+			$('#planEx2').val(datas[0].planEx);
+			$('#planOrderNo2').val(datas[0].planOrderNo);
+			$('#planProductNo2').val(datas[0].planProductNo);
+			$('#selectBom2').val(datas[0].planBomNo);
+			$('#planStart2').attr('min', datas[0].planStart);
+			$('#planStart2').attr('max', datas[0].planEnd);
+			$('#planEnd2').attr('min', datas[0].planStart);
+			$('#planEnd2').attr('max', datas[0].planEnd);
+		}
+		
+		//생산계획 수정 확인창
+		$().ready(function () {
+            $("#alertStart2").click(function () {
+            	if ($('#selectBom2').val() == "" || $('#selectBom2').val() == null) {
+					Swal.fire({
+                        icon: 'warning',
+                        title: 'BOM번호를 입력하세요!',
+                    })
+					return false;
+				}
+            	if ($('#planStart2').val() == "" || $('#planStart2').val() == null) {
+					Swal.fire({
+                        icon: 'warning',
+                        title: '시작일자를 입력하세요!',
+                    })
+					return false;
+				}
+            	if ($('#planEnd2').val() == "" || $('#planEnd2').val() == null) {
+					Swal.fire({
+                        icon: 'warning',
+                        title: '종료일자를 입력하세요!',
+                    })
+					return false;
+				}
+            	Swal.fire({
+                    icon: 'success',
+                    title: '생산계획 수정이 완료되었습니다.',
+                    text: 'success~',
+                }).then(function(){
+                	$('#insertFrm2').submit();
+                });
+                    return false;	                
+            });
+        });
+		
+		// 생산계획 정보 삭제
+		$().ready(function () {
+            $("#delbtn").click(function () {
+                Swal.fire({
+                    title: '선택한 생산계획을 삭제하시겠습니까?',
+                    text: "다시 되돌릴 수 없습니다. 신중하세요.",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: 'black',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '승인',
+                    cancelButtonText: '취소'
+                }).then((result) => {
+                	var datas = grid2.getCheckedRows();
+                	console.log(datas);
+                    if (result.isConfirmed) {
+                    	for(plan of datas){
+            				$.ajax({
+            					url : '/produce/planDelete',
+            					type : 'get',
+            					data : {planNo : plan.planNo},
+            					success : function(data){
+            						Swal.fire(
+            			                    '삭제가 완료되었습니다.',
+            			                    '화끈하시네요~!',
+            			                    'success'
+            						)
+            						planList();
+            					},
+            					error : function(reject){
+            						console.log(reject);
+            					}
+            				});
+            			}
+                    }
+                })
+            });
+        });
+		 tui.Grid.applyTheme("normal", {
+	         cell : {
+	            nomal : {
+	               background : "#fff",
+	               border : "#e0e0e0",
+	               showVerticalBorder : false,
+	               showHorizontalBorder : true
+	            },
+	            header : {
+	               background : "#eaeaea",
+	               border : "#e0e0e0",
+	               showHorizontalBorder : true
+	            },
+	            rowHeader : {
+	               background : "#eaeaea",
+	               border : "#e0e0e0",
+	               showVerticalBorder : false,
+	               showHorizontalBorder : true
+	            },
+	          
+	         },
+
+	      });
+		
+		</script>
+	</div>
+</body>
+</html>
